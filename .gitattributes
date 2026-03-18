@@ -1,0 +1,8 @@
+# HTML dosyalarını dil istatistiklerinden çıkar
+*.html linguist-detectable=false
+*.cshtml linguist-detectable=false
+*.css linguist-detectable=false
+*.js linguist-detectable=false
+
+# wwwroot klasörünü tamamen görmezden gel (Genelde kütüphaneler burada olur)
+wwwroot/* linguist-vendored
