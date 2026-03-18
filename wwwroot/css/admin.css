@@ -1,0 +1,25 @@
+.admin-sidebar {
+  width: 240px;
+  padding: 16px;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: #0b2447;
+  color: #fff;
+}
+.admin-sidebar a {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+}
+.admin-sidebar a:hover {
+  background: #19376d;
+}
+.admin-content {
+  margin-left: 260px;
+  padding: 24px;
+}

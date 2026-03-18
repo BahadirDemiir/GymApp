@@ -1,0 +1,32 @@
+@model List<GymAppFresh.Models.ViewModel.ProgramSuggestionVm>
+
+<div class="container py-4">
+  <h3 class="mb-3">Sana uygun program önerileri</h3>
+  <div class="row g-3">
+    @foreach (var s in Model)
+    {
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">@s.Program.Title</h5>
+            <p class="text-muted mb-2">@s.Program.Description</p>
+            <ul class="list-unstyled small mb-3">
+              <li><b>Hedef:</b> @s.Program.Goal</li>
+              <li><b>Seviye:</b> @s.Program.Level</li>
+              <li><b>Gün/Hafta:</b> @s.Program.DaysPerWeek</li>
+              <li><b>Split:</b> @s.Program.Split</li>
+              <li><b>Skor:</b> @s.Score</li>
+            </ul>
+            @if (!string.IsNullOrWhiteSpace(s.Why))
+            {
+              <div class="alert alert-secondary p-2 small">Neden: @s.Why</div>
+            }
+            <a class="btn btn-success w-100" href="@Url.Action("Details","Programs", new { id = s.Program.Id })">
+              Planı Başlat
+            </a>
+          </div>
+        </div>
+      </div>
+    }   
+  </div>
+</div>

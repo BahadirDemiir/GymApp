@@ -1,0 +1,15 @@
+# Visual Studio geçici dosyaları
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.dbmdl
+*.jfm
+
+# SQL Server dosyaları (Veritabanını script olarak yükleyeceğimiz için bunları engelliyoruz)
+*.mdf
+*.ldf
+
+# NuGet paketleri
+packages/

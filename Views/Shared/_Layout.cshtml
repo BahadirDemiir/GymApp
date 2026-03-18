@@ -1,0 +1,250 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+
+@inject IAuthorizationService Authz
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - GymAppFresh</title>
+    <meta name="description" content="Transform your fitness journey with GymAppFresh - Premium gym memberships, expert coaches, and world-class facilities." />
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    
+    @RenderSection("Styles", required: false)
+</head>
+<body class="gym-layout">
+    <nav class="navbar navbar-expand-lg fixed-top navbar-dark gym-navbar" id="gymNavbar">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+                <div class="brand-logo me-2">
+                    <i class="bi bi-dumbbell-fill"></i>
+                </div>
+                <span class="brand-text fw-bold">GymAppFresh</span>
+            </a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="bi bi-list"></i>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString()=="Index" && ViewContext.RouteData.Values["controller"]?.ToString()=="Home"?"active":"")" 
+                           asp-area="" asp-controller="Home" asp-action="Index">
+                            <i class="bi bi-house-door-fill me-1"></i>Ana Sayfa
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString()=="Course"?"active":"")" 
+                           asp-area="" asp-controller="Course" asp-action="Courses">
+                            <i class="bi bi-calendar-event me-1"></i>Kurslarımız
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString()=="Coach"?"active":"")" 
+                           asp-area="" asp-controller="Coach" asp-action="Coachs">
+                            <i class="bi bi-person-badge-fill me-1"></i>Online Koçlarımız
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString()=="Gym"?"active":"")" 
+                           asp-area="" asp-controller="Gym" asp-action="Map">
+                            <i class="bi bi-geo-alt-fill me-1"></i>Salonlarımız
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="navbar-nav ms-auto">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a class="nav-link admin-link me-3" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                                <i class="bi bi-shield-check me-1"></i>Admin
+                            </a>
+                        }
+
+                        @if ((await Authz.AuthorizeAsync(User, "Staff")).Succeeded)
+                        {
+                            <a class="nav-link staff-link me-3" asp-area="Staff" asp-controller="Schedule" asp-action="Index">
+                                <i class="bi bi-tools me-1"></i>Personel
+                            </a>
+                        }
+
+
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle user-dropdown d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="user-avatar me-2">
+                                    <i class="bi bi-person-circle-fill"></i>
+                                </div>
+                                <span class="d-none d-md-inline">@User.Identity.Name</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end gym-dropdown">
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Profile" asp-action="Profile">
+                                        <i class="bi bi-person me-2"></i>Profilim
+                                    </a>
+                                </li>
+
+                                @if (!string.IsNullOrEmpty(User.FindFirstValue(ClaimTypes.Role)))
+                                {
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Appointments" asp-action="My">
+                                            <i class="bi bi-calendar-check me-2"></i>Özel Derslerim
+                                        </a>
+                                    </li>   
+                                }
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form asp-controller="Home" asp-action="Logout" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="bi bi-box-arrow-right me-2"></i>Çıkış Yap
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-light me-2 gym-btn-outline" asp-area="" asp-controller="Register" asp-action="Phone">
+                            <i class="bi bi-person-plus me-1"></i>Kayıt Ol
+                        </a>
+                        <a class="btn btn-primary gym-btn-primary" asp-area="" asp-controller="Home" asp-action="Login">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Giriş Yap
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main role="main" class="main-content">
+        @RenderBody()
+    </main>
+
+    <footer class="gym-footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="footer-brand d-flex align-items-center mb-4">
+                        <div class="brand-logo me-3">
+                            <i class="bi bi-dumbbell-fill"></i>
+                        </div>
+                        <span class="brand-text fw-bold">GymAppFresh</span>
+                    </div>
+                    <p class="text-light mb-4">
+                        Son teknoloji tesisler, uzman rehberliği ve destekleyici bir topluluk aracılığıyla bireylerin fitness hedeflerine ulaşmalarını sağlıyoruz.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" target="_blank" aria-label="Instagram">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link" target="_blank" aria-label="Twitter">
+                            <i class="bi bi-twitter-x"></i>
+                        </a>
+                        <a href="#" class="social-link" target="_blank" aria-label="Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="#" class="social-link" target="_blank" aria-label="YouTube">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="footer-heading mb-3">Support</h6>
+                    <ul class="footer-links list-unstyled">
+                        <li><a href="#" class="footer-link">Yardım Merkezi</a></li>
+                        <li><a href="#contact" class="footer-link">Bizimle İletişe Geçin</a></li>
+                        <li><a href="#" class="footer-link">FAQ</a></li>
+                        <li><a href="#" class="footer-link">Geri Bildirim</a></li>
+                    </ul>
+                </div>
+            
+            <hr class="footer-divider my-4">
+            
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="text-light mb-0">
+                        &copy; @DateTime.Now.Year GymAppFresh. Bütün hakları saklıdır.
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="#" class="footer-link me-3">Gizlilik politikası</a>
+                    <a href="#" class="footer-link me-3">Hizmet Şartları</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navbar = document.getElementById('gymNavbar');
+            
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 100) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+
+            // Active navigation highlighting
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            navLinks.forEach(link => {
+                if (link.classList.contains('active')) {
+                    link.classList.add('fw-semibold');
+                }
+            });
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        const offsetTop = target.offsetTop - 80; // Account for fixed navbar
+                        window.scrollTo({
+                            top: offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Add animation classes on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-in');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe elements for animation
+            document.querySelectorAll('.animate-on-scroll').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+

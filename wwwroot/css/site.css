@@ -1,0 +1,271 @@
+:root {
+  --primary-light: #26f7fd; /* gynomonoecious bright light blue */
+  --primary-medium: #3d7afd; /* commeasurable lightish blue */
+  --primary-dark: #1f0954; /* pyelitic dark indigo */
+  --gradient-primary: linear-gradient(
+    135deg,
+    var(--primary-light) 0%,
+    var(--primary-medium) 50%,
+    var(--primary-dark) 100%
+  );
+  --gradient-light: linear-gradient(
+    135deg,
+    var(--primary-light) 0%,
+    var(--primary-medium) 100%
+  );
+  --gradient-dark: linear-gradient(
+    135deg,
+    var(--primary-medium) 0%,
+    var(--primary-dark) 100%
+  );
+}
+
+/* Body and Layout */
+body.gym-layout {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: var(--primary-dark);
+}
+
+/* Navigation Bar */
+.gym-navbar {
+  background: var(--gradient-primary) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(31, 9, 84, 0.15);
+  transition: all 0.3s ease;
+}
+
+.gym-navbar.scrolled {
+  background: rgba(31, 9, 84, 0.95) !important;
+  backdrop-filter: blur(15px);
+}
+
+/* Brand Logo */
+.brand-logo {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.brand-logo:hover {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  transform: scale(1.05);
+}
+
+.brand-text {
+  color: white !important;
+  font-family: "Orbitron", sans-serif;
+  font-weight: 700;
+}
+
+/* Navigation Links */
+.nav-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500;
+  padding: 0.75rem 1rem !important;
+  border-radius: 8px;
+  margin: 0 0.25rem;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.nav-link.active {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+}
+
+/* Buttons */
+.gym-btn-primary {
+  background: var(--gradient-light) !important;
+  border: none !important;
+  color: white !important;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(61, 122, 253, 0.3);
+}
+
+.gym-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(61, 122, 253, 0.4);
+  color: white !important;
+}
+
+.gym-btn-outline {
+  border: 2px solid var(--primary-light) !important;
+  color: var(--primary-light) !important;
+  background: transparent !important;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.gym-btn-outline:hover {
+  background: var(--primary-light) !important;
+  color: var(--primary-dark) !important;
+  transform: translateY(-2px);
+}
+
+/* Main Content */
+.main-content {
+  margin-top: 80px;
+  min-height: calc(100vh - 160px);
+}
+
+/* Footer */
+.gym-footer {
+  background: var(--gradient-dark) !important;
+  color: white;
+  padding: 3rem 0 1rem;
+  margin-top: auto;
+}
+
+.footer-brand .brand-logo {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.footer-brand .brand-text {
+  color: white !important;
+  font-family: "Orbitron", sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.footer-heading {
+  color: var(--primary-light);
+  font-weight: 600;
+}
+
+.footer-link {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.footer-link:hover {
+  color: var(--primary-light);
+  text-decoration: none;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: 50%;
+  text-decoration: none;
+  margin-right: 0.5rem;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.social-link:hover {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+/* Form Elements */
+.gym-input {
+  border: 2px solid rgba(61, 122, 253, 0.2);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.gym-input:focus {
+  border-color: var(--primary-medium);
+  box-shadow: 0 0 0 0.2rem rgba(61, 122, 253, 0.25);
+}
+
+/* Admin Link */
+.admin-link {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.admin-link:hover {
+  background: var(--primary-light);
+  color: var(--primary-dark) !important;
+}
+
+/* User Dropdown */
+.user-dropdown {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-avatar {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  padding: 0.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.gym-dropdown {
+  background: rgba(31, 9, 84, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+}
+
+.gym-dropdown .dropdown-item {
+  color: rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease;
+}
+
+.gym-dropdown .dropdown-item:hover {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+}
+
+/* Animation Classes */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease;
+}
+
+.animate-on-scroll.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Utility Classes */
+.text-gradient {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.bg-gradient-custom {
+  background: var(--gradient-primary);
+}
+
+.nav-link {
+  padding: 0.5rem 0.75rem !important;
+  margin: 0.25rem 0;
+}
+
+.main-content {
+  margin-top: 70px;
+}

@@ -1,0 +1,315 @@
+@model GymAppFresh.Models.ViewModel.CourseDetailVM
+@{
+    var course = Model.Course;
+    var category = Model.Category;
+}
+@using System.Globalization
+
+
+@section Styles{
+  <link rel="stylesheet" href="~/css/course-detail.css">
+  </style>
+}
+
+<div class="container course-wrap my-4">
+  <div class="course-card mb-4">
+    <div class="course-hero">
+      <div>
+        <h1>@course.Name</h1>
+        <div class="course-sub">@(category.Name ?? "Fitness") Kursu</div>
+      </div>
+
+      <span class="status-pill">
+        <i class="fas fa-star"></i>
+        @course.Level
+      </span>
+    </div>
+
+    <div class="course-body">
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="icon-bubble"><i class="fas fa-calendar"></i></div>
+          <div class="info-text">
+            <span class="label">Başlangıç Tarihi</span>
+            <span class="value">@course.StartDate.ToString("dd MMMM yyyy", new CultureInfo("tr-TR"))</span>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="icon-bubble"><i class="fas fa-clock"></i></div>
+          <div class="info-text">
+            <span class="label">Süre</span>
+            <span class="value">@course.Duration saat</span>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="icon-bubble"><i class="fas fa-users"></i></div>
+          <div class="info-text">
+            <span class="label">Mevcut Öğrenci</span>
+            <span class="value">@course.CurrentStudents / @course.MaxStudents</span>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="icon-bubble"><i class="fas fa-tag"></i></div>
+          <div class="info-text">
+            <span class="label">Fiyat</span>
+            <span class="value">@course.Price.ToString("C", new CultureInfo("tr-TR"))</span>
+          </div>
+        </div>
+      </div>
+
+      @if (ViewBag.MemberId != null)
+      {
+          @if (ViewBag.IsEnrolled == true)
+          {
+              <button class="btn btn-lg w-100 btn-success" disabled>Kursa Kayıtlısınız</button>
+          }
+          else if (course.CurrentStudents >= course.MaxStudents)
+          {
+              <button class="btn btn-lg w-100 btn-secondary" disabled>Kontenjan Dolu</button>
+          }
+          else
+          {
+              <button id="btnEnroll" class="btn btn-lg w-100 btn-primary">Hemen Kaydol</button>
+          }
+      }
+      else
+      {
+          <a href="@Url.Action("Login", "Home", new { returnUrl = Url.Action("CourseDetail", "Course", new { id = course.Id }) })" class="modal-trigger btn btn-lg w-100 btn-secondary">Giriş Yap ve Kaydol</a>
+      }
+        @if (ViewBag.MemberId != null && ViewBag.IsEnrolled != true && course.CurrentStudents < course.MaxStudents)
+        {
+          <div class="cta-row">
+            <!-- Modal -->
+            <div class="modal fade" id="enrollModal" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <form id="enrollForm" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="courseId" value="@Model.Course.Id" />
+                    <div class="modal-header">
+                      <h5 class="modal-title">Kursa Kayıt</h5>
+                      <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                      <!-- Kullanıcı login ise ad/email otomatik doldurulabilir.
+                          İstersen hiç göstermeyip sadece courseId gönderebilirsin. -->
+                      <div id="enrollErrors" class="text-danger small"></div>
+                    </div>
+                    <div class="modal-footer">
+                      <button class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                      <button class="btn btn-primary">Kaydı Tamamla</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="side-card">
+        <div class="side-title">Kurs Hakkında</div>
+        <img src="@course.Image" alt="@course.Name" class="course-image">
+        <p class="mb-0" style="color:#475569">
+          @course.Description
+        </p>
+      </div>
+      
+      @if (course.Coach != null)
+      {
+        <div class="side-card mt-4">
+          <div class="side-title">Eğitmen</div>
+          <div class="coach-card">
+            <div class="coach-avatar">
+              @if (!string.IsNullOrEmpty(course.Coach.Image))
+              {
+                <img src="@course.Coach.Image" alt="@course.Coach.Name" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+              }
+              else
+              {
+                @course.Coach.Name.Substring(0, 1)
+              }
+            </div>
+
+            <div class="flex-grow-1">
+              <div class="coach-head">
+                <div class="coach-name">@course.Coach.Name</div>
+                <span class="role-badge">@course.Coach.Level Eğitmen</span>
+              </div>
+
+              <div class="meta">
+                <span class="chip">
+                  <i class="fas fa-star"></i>
+                  @course.Coach.Rating.ToString("F1") (@course.Coach.ReviewCount değerlendirme)
+                </span>
+                <span class="chip">
+                  <i class="fas fa-users"></i>
+                  @course.Coach.StudentCount öğrenci
+                </span>
+                <span class="chip">
+                  <i class="fas fa-briefcase"></i>
+                  @course.Coach.ExperienceYears yıl deneyim
+                </span>
+              </div>
+
+              <div class="actions">
+                @if (!string.IsNullOrEmpty(course.Coach.InstagramUrl))
+                {
+                  <a href="@course.Coach.InstagramUrl" target="_blank">
+                    <i class="fab fa-instagram"></i> Instagram
+                  </a>
+                }
+                <a href="#" onclick="showCoachBio('@course.Coach.Bio')">
+                  <i class="fas fa-info-circle"></i> Biyografi
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+    
+    <div class="col-lg-4">
+      <div class="side-card">
+        <div class="side-title">Kurs Özeti</div>
+        <div class="mini mb-2">
+          <span>Kategori</span>
+          <strong>@(category.Name ?? "Belirtilmemiş")</strong>
+        </div>
+        <div class="mini mb-2">
+          <span>Seviye</span>
+          <strong>@(course.Level ?? "Başlangıç")</strong> 
+        </div>
+        <div class="mini mb-2">
+          <span>Başlangıç</span>
+          <strong>@course.StartDate.ToString("dd MMM yyyy", new CultureInfo("tr-TR"))</strong>
+        </div>
+        <div class="mini mb-2">
+          <span>Süre</span>
+          <strong>@course.Duration saat</strong>
+        </div>
+        <div class="mini mb-2">
+          <span>Kapasite</span>
+          <strong>@course.CurrentStudents / @course.MaxStudents</strong>
+        </div>
+        <div class="mini">
+          <span>Fiyat</span>
+          <strong>@course.Price.ToString("C", new CultureInfo("tr-TR"))</strong>
+        </div>
+      </div>
+      
+      <div class="side-card mt-4">
+        <div class="side-title">Değerlendirmeler</div>
+        <div class="rating-section">
+          <div class="stars">
+            @for (int i = 1; i <= 5; i++)
+            {
+              if (i <= course.Rating)
+              {
+                <i class="fas fa-star"></i>
+              }
+              else if (i - course.Rating < 1)
+              {
+                <i class="fas fa-star-half-alt"></i>
+              }
+              else
+              {
+                <i class="far fa-star"></i>
+              }
+            }
+          </div>
+          <div class="rating-text">
+            @course.Rating.ToString("F1") / 5 (@course.ReviewCount değerlendirme)
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>  
+</div>
+
+@section Scripts{
+<script>
+  const modalEl = document.getElementById('enrollModal');
+  const modal = new bootstrap.Modal(modalEl);
+
+  // Only show modal if user is not already enrolled and course is not full
+  document.getElementById('btnEnroll')?.addEventListener('click', () => {
+    @if (ViewBag.IsEnrolled != true && course.CurrentStudents < course.MaxStudents)
+    {
+      <text>modal.show();</text>
+    }
+  });
+
+  document.getElementById('enrollForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Double-check if course is full (safety measure)
+    const currentStudentsElement = document.querySelector('.info-item:nth-child(3) .value');
+    if (currentStudentsElement) {
+      const currentText = currentStudentsElement.textContent;
+      const parts = currentText.split(' / ');
+      if (parts.length === 2) {
+        const current = parseInt(parts[0]);
+        const max = parseInt(parts[1]);
+        if (current >= max) {
+          document.getElementById('enrollErrors').textContent = 'Kontenjan dolu!';
+          return;
+        }
+      }
+    }
+    
+    const form = e.currentTarget;
+    const err = document.getElementById('enrollErrors');
+    err.textContent = '';
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch('@Url.Action("Enroll","Course")', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.ok) {
+          modal.hide();
+          // Show success message
+          alert(data.message);
+          // Update the current students count
+          const currentStudentsElement = document.querySelector('.info-item:nth-child(3) .value');
+          if (currentStudentsElement) {
+            const currentText = currentStudentsElement.textContent;
+            const parts = currentText.split(' / ');
+            if (parts.length === 2) {
+              const current = parseInt(parts[0]) + 1;
+              const max = parts[1];
+              currentStudentsElement.textContent = `${current} / ${max}`;
+            }
+          }
+          // Disable the enroll button
+          const enrollBtn = document.getElementById('btnEnroll');
+          if (enrollBtn) {
+            enrollBtn.textContent = 'Kayıt Tamamlandı';
+            enrollBtn.disabled = true;
+            enrollBtn.classList.remove('btn-primary');
+            enrollBtn.classList.add('btn-success');
+          }
+        } else {
+          err.textContent = data.message || 'Kayıt sırasında hata oluştu';
+        }
+      } else {
+        const text = await res.text();
+        err.textContent = text || 'Kayıt sırasında hata oluştu';
+      }
+    } catch (error) {
+      err.textContent = 'Bir hata oluştu: ' + error.message;
+    }
+  });
+</script>
+}
+

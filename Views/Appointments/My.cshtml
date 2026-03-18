@@ -1,0 +1,210 @@
+@using GymAppFresh.Controllers
+@model List<MyApptVM>
+
+@{
+    ViewData["Title"] = "Randevularım";
+    var hasData = Model != null && Model.Any();
+}
+
+<div class="container py-4">
+    <!-- Header / Toolbar -->
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div class="d-flex align-items-center gap-2">
+            <h2 class="mb-0">Randevularım</h2>
+            @if (hasData)
+            {
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                    @Model.Count adet
+                </span>
+            }
+        </div>
+
+        <!-- (Opsiyonel) Filtre/Arama alanı; back-end ekleyene kadar sadece UI -->
+        <div class="input-group" style="max-width: 320px;">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input class="form-control" placeholder="PT, salon veya saat ara…" />
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success d-flex align-items-center" role="alert">
+            <i class="bi bi-check-circle me-2"></i>
+            <div>@TempData["Success"]</div>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <div>@TempData["Error"]</div>
+        </div>
+    }
+
+    <!-- Empty State -->
+    @if (!hasData)
+    {
+        <div class="card border-0 shadow-sm empty-card text-center p-5">
+            <div class="empty-illus mx-auto mb-3">
+                <!-- basit bir svg illüstrasyon -->
+                <svg width="88" height="88" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M7 3h10a2 2 0 0 1 2 2v14l-5-3-5 3V5a2 2 0 0 1 2-2z"
+                          stroke="currentColor" stroke-opacity=".3" stroke-width="1.5" />
+                    <path d="M9 8h6M9 11h6M9 14h4" stroke="currentColor" stroke-opacity=".5" stroke-width="1.5" />
+                </svg>
+            </div>
+            <h5 class="mb-1">Yaklaşan özel dersin yok gibi görünüyor</h5>
+            <p class="text-muted mb-3">PT’lerle slotları kontrol edip hızlıca randevu oluşturabilirsin 💪</p>
+            <a href="/Staff/BookAppointment" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> Yeni Randevu Al
+            </a>
+        </div>
+    }
+    else
+    {
+        <!-- Appointment List -->
+        <div class="vstack gap-3">
+            @foreach (var a in Model)
+            {
+                <div class="card appt-card border-0 shadow-sm">
+                    <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <!-- Left: Info -->
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="appt-icon text-primary flex-shrink-0">
+                                <i class="bi bi-calendar-week fs-3"></i>
+                            </div>
+                            <div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fw-semibold">@a.DayLabel</span>
+                                    <span class="badge bg-light text-body border">
+                                        <i class="bi bi-clock me-1"></i>@a.TimeRange
+                                    </span>
+                                </div>
+                                <div class="text-muted mt-1 small">
+                                    <span class="me-3">
+                                        <i class="bi bi-person-badge me-1"></i>PT: <strong>@a.StaffName</strong>
+                                    </span>
+                                    <span>
+                                        <i class="bi bi-geo-alt me-1"></i>Salon: <strong>@a.LocationName</strong>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Actions -->
+                        <div class="d-flex align-items-center gap-2 ms-auto">
+                            <a class="btn btn-outline-secondary"
+                               href="/Staff/Details/@a.Id" aria-label="Randevu detay">
+                                <i class="bi bi-eye me-1"></i> Detay
+                            </a>
+
+                            <!-- Cancel via Modal -->
+                            <button type="button"
+                                    class="btn btn-outline-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#cancelModal"
+                                    data-appt-id="@a.Id"
+                                    data-appt-label="@a.DayLabel @a.TimeRange">
+                                <i class="bi bi-x-circle me-1"></i> İptal
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Cancel Modal (Bootstrap) -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Cancel" method="post" id="cancelForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="cancelId" />
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel">Randevuyu İptal Et</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex align-items-start gap-3">
+                        <i class="bi bi-exclamation-octagon fs-3 text-danger"></i>
+                        <div>
+                            <p class="mb-1">Bu randevuyu iptal etmek istediğine emin misin?</p>
+                            <div class="small text-muted" id="cancelLabel"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-danger" id="cancelSubmit">
+                        <span class="submit-label"><i class="bi bi-x-circle me-1"></i>İptal Et</span>
+                        <span class="submit-spinner d-none">
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            İptal ediliyor…
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Modal'a tıklanan randevu bilgisini taşı
+        const cancelModal = document.getElementById('cancelModal');
+        cancelModal?.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+            const apptId = button?.getAttribute('data-appt-id');
+            const apptLabel = button?.getAttribute('data-appt-label');
+
+            document.getElementById('cancelId').value = apptId || '';
+            document.getElementById('cancelLabel').textContent = apptLabel || '';
+        });
+
+        // Submit sırasında spinner göster
+        const cancelForm = document.getElementById('cancelForm');
+        cancelForm?.addEventListener('submit', function () {
+            const submitBtn = document.getElementById('cancelSubmit');
+            submitBtn?.setAttribute('disabled', 'disabled');
+            submitBtn?.classList.add('disabled');
+
+            submitBtn?.querySelector('.submit-label')?.classList.add('d-none');
+            submitBtn?.querySelector('.submit-spinner')?.classList.remove('d-none');
+        });
+    </script>
+}
+
+<style>
+    /* Soft card vibe */
+    .appt-card {
+        transition: transform .12s ease, box-shadow .12s ease;
+        border-radius: 1rem;
+    }
+
+        .appt-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.08);
+        }
+
+    .empty-card {
+        border-radius: 1rem;
+    }
+
+    .empty-illus {
+        width: 88px;
+        height: 88px;
+        color: var(--bs-primary);
+        opacity: .6;
+    }
+
+    .badge.bg-primary-subtle {
+        background: rgba(var(--bs-primary-rgb), .08);
+    }
+
+    .border-primary-subtle {
+        border-color: rgba(var(--bs-primary-rgb), .2) !important;
+    }
+</style>

@@ -1,0 +1,57 @@
+@* Views/Booking/Index.cshtml *@
+@model (int staffId, DateTime date, int memberId)
+
+<div class="card p-3">  
+  <div class="d-flex gap-2 align-items-end">
+    <div>
+      <label class="form-label">Tarih</label>
+      <input id="date" type="date" class="form-control" value="@Model.date.ToString("yyyy-MM-dd")"/>
+    </div>
+    <div>
+      <label class="form-label">Slot (dk)</label>
+      <select id="slotMin" class="form-select">
+        <option>30</option>
+        <option>60</option>
+      </select>
+    </div>
+    <button id="load" class="btn btn-primary">Uygun Slotları Getir</button>
+  </div>
+
+  <div id="slots" class="d-flex flex-wrap gap-2 mt-3"></div>
+</div>
+
+@section Scripts{
+<script>
+const staffId = @Model.staffId;
+const memberId = @Model.memberId;
+
+document.getElementById('load').addEventListener('click', async ()=>{
+  const date = document.getElementById('date').value;
+  const slotMin = document.getElementById('slotMin').value;
+  const res = await fetch(`/Booking/Slots?staffId=${staffId}&date=${date}&slotMinutes=${slotMin}`);
+  const data = await res.json();
+  const wrap = document.getElementById('slots');
+  wrap.innerHTML = "";
+  if(data.length === 0){
+    wrap.innerHTML = `<div class="text-muted">No slots, maybe change date? 🙂</div>`;
+    return;
+  }
+  data.forEach(s=>{
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-outline-success';
+    btn.textContent = `${s.Start} - ${s.End}`;
+    btn.onclick = async () => {
+      const fd = new FormData();
+      fd.append('staffId', staffId);
+      fd.append('memberId', memberId);
+      fd.append('date', date);
+      fd.append('startHHmm', s.Start);
+      fd.append('slotMinutes', slotMin);
+      const r = await fetch('/Booking/Book', { method:'POST', body: fd, headers: {'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()} });
+      if(r.ok){ alert('Booked 🎉'); } else { alert('Oops, slot dolu olabilir'); }
+    };
+    wrap.appendChild(btn);
+  });
+});
+</script>
+}

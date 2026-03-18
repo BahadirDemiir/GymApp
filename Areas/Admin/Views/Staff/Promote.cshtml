@@ -1,0 +1,45 @@
+@model GymAppFresh.Areas.Admin.Controllers.PromoteToStaffVM
+@{
+    ViewData["Title"] = "Staff'a Terfi";
+}
+<div class="card p-3">
+  <h5 class="mb-3">Staff'a Terfi: <strong>@Model.MemberName</strong></h5>
+  
+  @if (!ViewData.ModelState.IsValid)
+  {
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+          <li>@error.ErrorMessage</li>
+        }
+      </ul>
+    </div>
+  }
+  
+  <form asp-action="Promote" method="post" class="row g-3">
+    <input type="hidden" asp-for="MemberId" />
+    <div class="col-md-6">
+      <label class="form-label">Rol <span class="text-danger">*</span></label>
+      <select class="form-select" asp-for="RoleId" asp-items="@(new SelectList(Model.Roles, "Id", "Name"))">
+        <option value="">-- Rol Seçin --</option>
+      </select>
+      <span asp-validation-for="RoleId" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Salon <span class="text-danger">*</span></label>
+      <select class="form-select" asp-for="GymLocationId" asp-items="@(new SelectList(Model.Gyms, "Id", "Name"))">
+        <option value="">-- Salon Seçin --</option>
+      </select>
+      <span asp-validation-for="GymLocationId" class="text-danger"></span>
+    </div>
+    <div class="col-12 text-end">
+      <button type="submit" class="btn btn-primary">Kaydet</button>
+      <a class="btn btn-outline-secondary" asp-area="Admin" asp-controller="Staff" asp-action="List">İptal</a>
+    </div>
+  </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

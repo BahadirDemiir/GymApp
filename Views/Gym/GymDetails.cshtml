@@ -1,0 +1,311 @@
+@model GymAppFresh.Models.GymLocation
+@{
+    var gym = Model;
+}
+@using System.Globalization
+@{
+    var hasCoords = Model.Latitude != 0 && Model.Longitude != 0;
+    var latStr = Model.Latitude.ToString(CultureInfo.InvariantCulture);
+    var lngStr = Model.Longitude.ToString(CultureInfo.InvariantCulture);
+
+    var mapsHref = hasCoords
+        ? $"https://www.google.com/maps/dir/?api=1&destination={latStr},{lngStr}&travelmode=driving"
+        : $"https://www.google.com/maps/search/?api=1&query={Uri.EscapeDataString(Model.Name ?? "Gym")}";
+}
+@section Styles{
+  <link rel="stylesheet" href="~/css/gym-details.css">
+}
+
+<div class="container gym-wrap my-4">
+  <div class="gym-card mb-4">
+    <div class="gym-hero">
+      <div>
+        <h1>@gym.Name</h1>
+        <div class="gym-sub">Premium Fitness & Wellness</div>
+        @if (!string.IsNullOrEmpty(gym.City?.Name))
+        {
+          <div class="gym-location">
+            <i class="bi bi-geo-alt-fill me-2"></i>@gym.City.Name
+          </div>
+        }
+      </div>
+
+      <span class="status-pill @(gym.IsActive ? "status-active" : "status-inactive")">
+        <i class="bi @(gym.IsActive ? "bi-circle-fill" : "bi-circle")"></i>
+        @(gym.IsActive ? "Aktif" : "Pasif")
+      </span>
+    </div>
+
+    <div class="gym-body">
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="icon-bubble"><i class="bi bi-door-open"></i></div>
+          <div class="info-text">
+            <span class="label">Hafta İçi Açılış</span>
+            <span class="value">@((gym.OpenTime.ToString(@"hh\:mm")))</span>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="icon-bubble"><i class="bi bi-door-closed"></i></div>
+          <div class="info-text">
+            <span class="label">Hafta İçi Kapanış</span>
+            <span class="value">@((gym.CloseTime.ToString(@"hh\:mm")))</span>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="icon-bubble"><i class="bi bi-calendar-week"></i></div>
+          <div class="info-text">
+            <span class="label">Hafta Sonu Açılış</span>
+            <span class="value">@((gym.WOpenTime.ToString(@"hh\:mm")))</span>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="icon-bubble"><i class="bi bi-calendar-week"></i></div>
+          <div class="info-text">
+            <span class="label">Hafta Sonu Kapanış</span>
+            <span class="value">@((gym.WCloseTime.ToString(@"hh\:mm")))</span>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="icon-bubble"><i class="bi bi-people"></i></div>
+          <div class="info-text">
+            <span class="label">Mevcut Üye</span>
+            <span class="value">@((gym.currentMember.ToString()))</span>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="icon-bubble"><i class="bi bi-dumbbell"></i></div>
+          <div class="info-text">
+            <span class="label">Programlar</span>
+            <span class="value">Fitness, Cardio, CrossFit</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-row">
+        <a href="#" class="btn-soft"><i class="bi bi-calendar-check"></i> Hemen Kaydol</a>
+        <a id="btnDirections" href="@mapsHref" class="btn-ghost"><i class="bi bi-geo-alt"></i> Yol Tarifi</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gym Images Section -->
+  @if (!string.IsNullOrEmpty(gym.Images))
+  {
+    <div class="gym-images-section mb-4">
+      <div class="side-card">
+        <div class="side-title">
+          <i class="bi bi-images me-2"></i>Galeri
+        </div>
+        <div class="gym-images-grid">
+          @foreach (var imagePath in gym.Images.Split(','))
+          {
+            if (!string.IsNullOrWhiteSpace(imagePath))
+            {
+              <div class="gym-image-item">
+                <img src="@imagePath.Trim()" alt="@gym.Name" class="gym-image" />
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="side-card">
+        <div class="side-title">
+          <i class="bi bi-info-circle me-2"></i>Hakkında
+        </div>
+        <p class="mb-0" style="color:#475569">
+          Şehrin kalbinde, modern ekipmanlar ve ferah bir antrenman alanıyla performansını en üst seviyeye taşı.
+          Uzman eğitmenler ve kişiselleştirilmiş programlarla hedeflerine hızlıca ulaş.
+        </p>
+      </div>
+    </div>
+    
+    <div class="col-lg-4">
+      <div class="side-card">
+        <div class="side-title">
+          <i class="bi bi-clock-history me-2"></i>Çalışma Saatleri
+        </div>
+        <div class="schedule-info">
+          <div class="schedule-day mb-3">
+            <div class="day-label">Hafta İçi</div>
+            <div class="time-range">
+              <span class="time">@((gym.OpenTime.ToString(@"hh\:mm")))</span>
+              <span class="separator">-</span>
+              <span class="time">@((gym.CloseTime.ToString(@"hh\:mm")))</span>
+            </div>
+          </div>
+          <div class="schedule-day">
+            <div class="day-label">Hafta Sonu</div>
+            <div class="time-range">
+              <span class="time">@((gym.WOpenTime.ToString(@"hh\:mm")))</span>
+              <span class="separator">-</span>
+              <span class="time">@((gym.WCloseTime.ToString(@"hh\:mm")))</span>
+            </div>
+          </div>
+        </div>
+        
+        <hr class="my-3" />
+        
+        <div class="mini mb-2">
+          <span>Durum</span>
+          <strong class="@(gym.IsActive ? "text-success" : "text-danger")">@(gym.IsActive ? "Aktif" : "Pasif")</strong>
+        </div>
+        <div class="mini mb-2">
+          <span>Mevcut Üye</span>
+          <strong>@((gym.currentMember.ToString()))</strong>
+        </div>
+        @if (!string.IsNullOrEmpty(gym.City?.Name))
+        {
+          <div class="mini">
+            <span>Şehir</span>
+            <strong>@gym.City.Name</strong>
+          </div>
+        }
+      </div>
+    </div>
+    
+    @if (Model.GymStaffs?.Any() == true)
+    {
+      <div class="col-12">
+        <div class="side-card mt-4">
+          <div class="side-title">
+            <i class="bi bi-people-fill me-2"></i>Eğitmenler & Personel
+          </div>
+
+          <div class="row g-3 staff-grid">
+            @foreach (var s in Model.GymStaffs.Where(x => x.IsActive))
+            {
+              <div class="col-sm-6 col-lg-4">
+                <div class="staff-card">
+                  <!-- Fotoğrafın yoksa baş harfli avatar -->
+                  <div class="staff-avatar">@s.FullName.Substring(0,1)</div>
+
+                  <div class="flex-grow-1">
+                    <div class="staff-head">
+                      <div class="staff-name">@s.FullName</div>
+                      <span class="role-badge">@s.Role?.Name</span>
+                    </div>
+
+                    @if (s.ShiftStart != null && s.ShiftEnd != null)
+                    {
+                      <div class="meta">
+                        <span class="chip"><i class="bi bi-clock"></i>
+                          @s.ShiftStart?.ToString(@"hh\:mm") – @s.ShiftEnd?.ToString(@"hh\:mm")
+                        </span>
+                      </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(s.Phone) || !string.IsNullOrWhiteSpace(s.Email))
+                    {
+                      <div class="actions">
+                        @if (!string.IsNullOrWhiteSpace(s.Phone))
+                        { <a href="tel:@s.Phone"><i class="bi bi-telephone"></i> Ara</a> }
+
+                        @if (!string.IsNullOrWhiteSpace(s.Email))
+                        { <a href="mailto:@s.Email"><i class="bi bi-envelope"></i> E-posta</a> }
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+    else
+    {
+      <div class="col-12">
+        <div class="side-card mt-4">
+          <div class="side-title">
+            <i class="bi bi-people-fill me-2"></i>Eğitmenler & Personel
+          </div>
+          <div class="empty-state">
+            <i class="bi bi-people text-muted mb-2" style="font-size: 2rem;"></i>
+            <p class="mb-0 text-muted">Bu salonda kayıtlı personel bulunmuyor.</p>
+          </div>
+        </div>
+      </div>
+    }
+  </div>  
+</div>
+
+<script>
+(function () {
+  const btn = document.getElementById('btnDirections');
+  if (!btn) return;
+
+  const hasCoords = @hasCoords.ToString().ToLower();
+  const destLat = "@latStr";
+  const destLng = "@lngStr";
+  const destName = "@(Model.Name ?? "Gym")";
+
+  function isIOS() {
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    return /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  }
+
+  function openNew(url) {
+    window.open(url, "_blank");
+  }
+
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+
+    const gmBase = "https://www.google.com/maps/dir/?api=1";
+    const appleBase = "http://maps.apple.com/";
+
+    const destParam = hasCoords
+      ? `${destLat},${destLng}`
+      : encodeURIComponent(destName);
+
+    const fallbackUrl = isIOS()
+      ? (hasCoords
+          ? `${appleBase}?daddr=${destParam}&dirflg=d`
+          : `${appleBase}?daddr=${encodeURIComponent(destName)}&dirflg=d`)
+      : (hasCoords
+          ? `${gmBase}&destination=${destParam}&travelmode=driving`
+          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destName)}`);
+
+    if (!navigator.geolocation) {
+      openNew(fallbackUrl);
+      return;
+    }
+
+    const timeoutMs = 6000;
+    let done = false;
+    const timer = setTimeout(() => {
+      if (done) return; done = true;
+      openNew(fallbackUrl);
+    }, timeoutMs);
+
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        if (done) return; done = true; clearTimeout(timer);
+
+        const origin = `${pos.coords.latitude},${pos.coords.longitude}`;
+        const url = isIOS()
+          ? `${appleBase}?saddr=${origin}&daddr=${destParam}&dirflg=d`
+          : `${gmBase}&origin=${encodeURIComponent(origin)}&destination=${destParam}&travelmode=driving`;
+
+        openNew(url);
+      },
+      _err => {
+        if (done) return; done = true; clearTimeout(timer);
+        openNew(fallbackUrl);
+      },
+      { enableHighAccuracy: false, maximumAge: 600000, timeout: timeoutMs }
+    );
+  });
+})();
+</script>

@@ -1,0 +1,49 @@
+@model List<GymAppFresh.Areas.Admin.Controllers.MemberRow>
+@{
+    ViewData["Title"] = "Staff Yönetimi";
+}
+
+<div class="card p-3">
+  <h4 class="mb-3">Üyeler</h4>
+  <div class="table-responsive">
+    <table class="table table-sm align-middle">
+      <thead><tr><th>ID</th><th>Ad</th><th>E-posta</th><th>Durum</th><th class="text-end"></th></tr></thead>
+      <tbody>
+      @foreach (var m in Model)
+      {
+        <tr>
+          <td>@m.MemberId</td>
+          <td>@m.Name</td>
+          <td>@m.Email</td>
+          <td>
+            @if (m.IsStaff) { <span class="badge bg-success">Staff</span> }
+            else { <span class="badge bg-secondary">Üye</span> }
+          </td>
+          <td class="text-end">
+            <a class="btn btn-primary btn-sm" asp-area="Admin" asp-controller="Staff" asp-action="Promote" asp-route-memberId="@m.MemberId">
+              Staff’a Terfi
+            </a>
+            @if (m.IsStaff)
+            {
+              <form asp-area="Admin" asp-controller="Staff" asp-action="Deactivate" method="post" class="d-inline">
+                <input type="hidden" name="memberId" value="@m.MemberId" />
+                <button class="btn btn-outline-danger btn-sm">Pasifleştir</button>
+              </form>
+            }
+          </td>
+        </tr>
+      }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+@if (TempData["ok"] != null)
+{
+  <div class="alert alert-success mt-3">@TempData["ok"]</div>
+}
+
+@if (TempData["error"] != null)
+{
+  <div class="alert alert-danger mt-3">@TempData["error"]</div>
+}

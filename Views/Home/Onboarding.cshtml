@@ -1,0 +1,142 @@
+@model GymAppFresh.Models.ViewModel.OnboardingViewModel
+
+@{
+    ViewData["Title"] = "Profilinizi Tamamlayın";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient bg-primary text-white text-center py-4">
+                    <h3 class="mb-0">
+                        <i class="bi bi-person-check-fill me-2"></i>
+                        Profilinizi Tamamlayın
+                    </h3>
+                    <p class="mb-0 mt-2 opacity-75">Kişiselleştirilmiş deneyim için birkaç bilgi daha</p>
+                </div>
+                
+                <div class="card-body p-4">
+                    <!-- Progress Bar -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Profil Tamamlama</small>
+                            <small class="text-muted">6/6</small>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <form asp-action="Onboarding" method="post">
+                        <input type="hidden" asp-for="Id">
+                        
+                        <!-- Validation Summary -->
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <div class="row g-3">
+                            <!-- Height -->
+                            <div class="col-md-6">
+                                <label asp-for="Height" class="form-label">
+                                    <i class="bi bi-rulers me-1"></i>Boy (cm)
+                                </label>
+                                <input asp-for="Height" class="form-control" type="number" step="0.1" placeholder="Örn: 175" />
+                                <span asp-validation-for="Height" class="text-danger"></span>
+                            </div>
+
+                            <!-- Weight -->
+                            <div class="col-md-6">
+                                <label asp-for="Weight" class="form-label">
+                                    <i class="bi bi-speedometer2 me-1"></i>Kilo (kg)
+                                </label>
+                                <input asp-for="Weight" class="form-control" type="number" step="0.1" placeholder="Örn: 70" />
+                                <span asp-validation-for="Weight" class="text-danger"></span>
+                            </div>
+
+                            <!-- Gender -->
+                            <div class="col-md-6">
+                                <label asp-for="Gender" class="form-label">
+                                    <i class="bi bi-gender-ambiguous me-1"></i>Cinsiyet
+                                </label>
+                                <select asp-for="Gender" class="form-select">
+                                    <option value="">Seçiniz</option>
+                                    <option value="1">Erkek</option>
+                                    <option value="2">Kadın</option>
+                                </select>
+                                <span asp-validation-for="Gender" class="text-danger"></span>
+                            </div>
+
+                            <!-- Birth Date -->
+                            <div class="col-md-6">
+                                <label asp-for="BirthDate" class="form-label">
+                                    <i class="bi bi-calendar-date me-1"></i>Doğum Tarihi
+                                </label>
+                                <input asp-for="BirthDate" class="form-control" type="date" />
+                                <span asp-validation-for="BirthDate" class="text-danger"></span>
+                            </div>
+
+                            <!-- Fitness Goal -->
+                            <div class="col-12">
+                                <label asp-for="FitnessGoal" class="form-label">
+                                    <i class="bi bi-bullseye me-1"></i>Fitness Hedefiniz
+                                </label>
+                                <select asp-for="FitnessGoal" class="form-select">
+                                    <option value="">Seçiniz</option>
+                                    <option value="1">Kilo Vermek</option>
+                                    <option value="2">Kilo Almak</option>
+                                    <option value="3">Kilo Korumak</option>
+                                    <option value="4">Sağlığı İyileştirmek</option>
+                                    <option value="5">Kas Geliştirmek</option>
+                                    <option value="6">Yağ Yakmak</option>
+                                </select>
+                                <span asp-validation-for="FitnessGoal" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="daysPerWeek" class="form-label">
+                                <i class="bi bi-calendar-date me-1"></i>Haftada Kaç Gün Egzersiz Yapıyorsunuz?
+                            </label>
+                            <select asp-for="daysPerWeek" class="form-select">
+                                <option value="">Seçiniz</option>
+                                <option value="1">1 Gün</option>
+                                <option value="2">2 Gün</option>
+                                <option value="3">3 Gün</option>
+                                <option value="4">4 Gün</option>
+                                <option value="5">5 Gün</option>
+                                <option value="6">6 Gün</option>
+                                <option value="7">7 Gün</option>
+                            </select>
+                            <span asp-validation-for="daysPerWeek" class="text-danger"></span>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Profilimi Tamamla
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="card mt-4 border-0 bg-light">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Neden bu bilgileri istiyoruz?
+                    </h6>
+                    <p class="card-text small text-muted mb-0">
+                        Bu bilgiler sayesinde size özel egzersiz programları ve beslenme önerileri sunabiliriz.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

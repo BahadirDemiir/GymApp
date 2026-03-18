@@ -1,0 +1,23 @@
+@* Views/Register/Review.cshtml *@
+@model RegisterWizardVM
+@await Html.PartialAsync("_WizardSteps", Model.CurrentStep)
+
+<div class="card p-3">
+  <h5 class="mb-3">Özet</h5>
+  <ul class="list-group mb-3">
+    <li class="list-group-item d-flex justify-content-between"><span>Telefon</span><strong>@Model.Phone</strong></li>
+    <li class="list-group-item d-flex justify-content-between"><span>Salon</span><strong>@Model.SelectedGymName</strong></li>
+    <li class="list-group-item d-flex justify-content-between"><span>Membership</span>
+        <strong>@Model.SelectedMembershipName (@Model.SelectedMembershipPrice TL/ay)</strong></li>
+    <li class="list-group-item d-flex justify-content-between"><span>Ad Soyad</span>
+        <strong>@Model.FirstName @Model.LastName</strong></li>
+    <li class="list-group-item d-flex justify-content-between"><span>E-mail</span><strong>@Model.Email</strong></li>
+  </ul>
+
+  <form asp-action="Confirm" method="post">
+    <div class="d-flex justify-content-between">
+      <a asp-action="Details" class="btn btn-outline-secondary">Geri</a>
+      <button type="submit" class="btn btn-success">Kaydı Tamamla</button>
+    </div>
+  </form>
+</div>

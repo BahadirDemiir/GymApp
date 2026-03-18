@@ -1,0 +1,160 @@
+/* Courses Page Specific Styles */
+
+/* Skeleton Loading Animation */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Course Card Optimizations */
+.course-item {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    will-change: transform;
+}
+
+.course-item:hover {
+    transform: translateY(-4px);
+}
+
+.item-card {
+    border: none;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.item-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Image Optimization */
+.item-image {
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    will-change: transform;
+}
+
+.item-card:hover .item-image {
+    transform: scale(1.05);
+}
+
+/* Badge Optimizations */
+.category-badge, .level-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.category-badge {
+    background: rgba(13, 110, 253, 0.9);
+    color: white;
+}
+
+.level-badge {
+    background: rgba(25, 135, 84, 0.9);
+    color: white;
+}
+
+.price-tag {
+    background: rgba(220, 53, 69, 0.9);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Performance Optimizations */
+.course-item {
+    contain: layout style paint;
+}
+
+.item-card {
+    contain: layout style;
+}
+
+/* Responsive Optimizations */
+@media (max-width: 768px) {
+    .course-item {
+        margin-bottom: 1rem;
+    }
+    
+    .item-image {
+        height: 180px !important;
+    }
+    
+    .category-badge, .level-badge {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+    }
+    
+    .price-tag {
+        font-size: 0.8rem;
+        padding: 4px 8px;
+    }
+}
+
+/* Loading States */
+#skeletonLoader {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#skeletonLoader.show {
+    opacity: 1;
+}
+
+/* Smooth Transitions */
+.course-item {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.course-item.hidden {
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+}
+
+/* Button Optimizations */
+.btn {
+    transition: all 0.2s ease;
+    will-change: transform;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}

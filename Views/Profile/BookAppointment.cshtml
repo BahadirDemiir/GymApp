@@ -1,0 +1,294 @@
+@model List<GymAppFresh.Models.GymStaff>
+@{
+    ViewData["Title"] = "PT Randevusu Al";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-primary">
+                    <i class="bi bi-calendar-plus me-2"></i>PT Randevusu Al
+                </h2>
+                <p class="text-muted">Kişisel antrenörünüzden randevu alın</p>
+            </div>
+
+            <!-- Error Message -->
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>@TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- PT Selection -->
+            <div class="row g-4">
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var pt in Model)
+                    {
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="card h-100 shadow-sm border-0">
+                                <div class="card-body text-center p-4">
+                                    <!-- PT Avatar -->
+                                    <div class="mb-3">
+                                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center" style="width:80px;height:80px;">
+                                            <i class="bi bi-person-fill" style="font-size:2rem;"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- PT Info -->
+                                    <h5 class="card-title fw-bold mb-2">@pt.FullName</h5>
+                                    <p class="text-muted small mb-3">Kişisel Antrenör</p>
+                                    
+                                    <!-- Contact Info -->
+                                    <div class="mb-3">
+                                        @if (!string.IsNullOrEmpty(pt.Email))
+                                        {
+                                            <div class="d-flex align-items-center justify-content-center mb-1">
+                                                <i class="bi bi-envelope me-2 text-muted"></i>
+                                                <small class="text-muted">@pt.Email</small>
+                                            </div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(pt.Phone))
+                                        {
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <i class="bi bi-telephone me-2 text-muted"></i>
+                                                <small class="text-muted">@pt.Phone</small>
+                                            </div>
+                                        }
+                                    </div>
+                                    
+                                    <!-- Select Button -->
+                                    <button class="btn btn-primary w-100 select-pt-btn" 
+                                            data-staff-id="@pt.Id" 
+                                            data-staff-name="@pt.FullName">
+                                        <i class="bi bi-calendar-check me-1"></i>Randevu Al
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Henüz PT bulunmuyor</strong><br>
+                            Bu gym lokasyonunda aktif kişisel antrenör bulunmamaktadır.
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Date Selection (Hidden initially) -->
+            <div id="date-selection" class="mt-4" style="display: none;">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calendar3 me-2"></i>Tarih Seçin
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <label for="appointment-date" class="form-label">Tarih</label>
+                                <input type="date" id="appointment-date" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Müsait Saatler</label>
+                                <div id="available-slots" class="border rounded p-3" style="min-height: 100px;">
+                                    <div class="text-center text-muted">
+                                        <i class="bi bi-clock me-2"></i>Önce tarih seçin
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <button id="book-appointment-btn" class="btn btn-success" disabled>
+                                <i class="bi bi-check-circle me-1"></i>Randevuyu Onayla
+                            </button>
+                            <button id="back-to-pt-selection" class="btn btn-secondary ms-2">
+                                <i class="bi bi-arrow-left me-1"></i>Geri Dön
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedStaffId = null;
+let selectedStaffName = null;
+let selectedDate = null;
+let selectedTimeSlot = null;
+
+const gridEl = document.querySelector('.row.g-4');
+const dateSelEl = document.getElementById('date-selection');
+const bookBtn = document.getElementById('book-appointment-btn');
+
+// PT Selection
+document.querySelectorAll('.select-pt-btn').forEach(btn => {
+  btn.addEventListener('click', function () {
+    selectedStaffId = this.dataset.staffId;
+    selectedStaffName = this.dataset.staffName;
+
+    gridEl.style.display = 'none';
+    dateSelEl.style.display = 'block';
+
+    document.querySelector('.card-header h5').innerHTML =
+      `<i class="bi bi-calendar3 me-2"></i>Tarih Seçin - ${selectedStaffName}`;
+
+    // reset state
+    selectedDate = null;
+    selectedTimeSlot = null;
+    document.getElementById('appointment-date').value = '';
+    setBookBtnState('idle');
+    document.getElementById('available-slots').innerHTML =
+      '<div class="text-center text-muted"><i class="bi bi-clock me-2"></i>Önce tarih seçin</div>';
+  });
+});
+
+// Back to PT selection
+document.getElementById('back-to-pt-selection').addEventListener('click', function () {
+  gridEl.style.display = 'block';
+  dateSelEl.style.display = 'none';
+  selectedStaffId = null;
+  selectedStaffName = null;
+  selectedDate = null;
+  selectedTimeSlot = null;
+  setBookBtnState('idle');
+});
+
+// Date selection
+document.getElementById('appointment-date').addEventListener('change', function () {
+  selectedDate = this.value;
+
+  // Tarih seçildi, henüz saat yok → buton görünür ve uyarı rengi (warning)
+  if (selectedDate && !selectedTimeSlot) setBookBtnState('need-slot');
+
+  if (selectedDate && selectedStaffId) {
+    loadAvailableSlots();
+  } else {
+    document.getElementById('available-slots').innerHTML =
+      '<div class="text-center text-muted"><i class="bi bi-clock me-2"></i>Önce tarih seçin</div>';
+  }
+});
+
+
+function setBookBtnState(state) {
+  bookBtn.disabled = true;
+  bookBtn.classList.remove('btn-success', 'btn-danger', 'btn-warning', 'btn-secondary');
+
+  if (state === 'idle') {
+    bookBtn.classList.add('btn-secondary');
+    bookBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Randevuyu Onayla';
+  } else if (state === 'need-slot') {
+    bookBtn.classList.add('btn-warning');
+    bookBtn.innerHTML = '<i class="bi bi-clock me-1"></i>Önce saat seç';
+  } else if (state === 'ready') {
+    bookBtn.classList.add('btn-danger');
+    bookBtn.disabled = false;
+    bookBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Randevuyu Onayla';
+  }
+}
+
+// Load available slots
+function loadAvailableSlots() {
+  const slotsContainer = document.getElementById('available-slots');
+  slotsContainer.innerHTML = '<div class="text-center"><i class="bi bi-hourglass-split me-2"></i>Yükleniyor...</div>';
+
+  fetch(`/Booking/Slots?staffId=${selectedStaffId}&date=${selectedDate}&slotMinutes=120`)
+    .then(response => response.json())
+    .then(slots => {
+      if (slots && slots.length > 0) {
+        slotsContainer.innerHTML = '';
+        slots.forEach(slot => {
+          const slotBtn = document.createElement('button');
+          slotBtn.className = 'btn btn-outline-primary me-2 mb-2';
+          slotBtn.textContent = `${slot.start} - ${slot.end}`;
+          slotBtn.dataset.start = slot.start;
+          slotBtn.dataset.end = slot.end;
+
+          slotBtn.addEventListener('click', function () {
+            // diğerlerini pasifleştir
+            document.querySelectorAll('#available-slots .btn').forEach(btn => {
+              btn.classList.remove('btn-danger', 'btn-primary');
+              btn.classList.add('btn-outline-primary');
+            });
+
+            // seçili butonu kırmızı yap
+            this.classList.remove('btn-outline-primary');
+            this.classList.add('btn-danger');
+
+            selectedTimeSlot = this.dataset.start;
+
+            // tarih + saat seçildiyse onay butonu kırmızı ve aktif
+            if (selectedDate && selectedTimeSlot) {
+              setBookBtnState('ready');
+            }
+          });
+
+          slotsContainer.appendChild(slotBtn);
+        });
+
+        // Tarih seçildi ama slot daha seçilmedi ise uyarı modunda tut
+        if (!selectedTimeSlot) setBookBtnState('need-slot');
+      } else {
+        slotsContainer.innerHTML = '<div class="text-center text-muted"><i class="bi bi-calendar-x me-2"></i>Bu tarihte müsait saat bulunmuyor</div>';
+        setBookBtnState('idle');
+      }
+    })
+    .catch(error => {
+      console.error('Error loading slots:', error);
+      slotsContainer.innerHTML = '<div class="text-center text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Hata oluştu</div>';
+      setBookBtnState('idle');
+    });
+}
+
+// Book appointment
+bookBtn.addEventListener('click', function () {
+  if (!selectedStaffId || !selectedDate || !selectedTimeSlot) {
+    alert('Lütfen tarih ve saat seçiniz 💬');
+    return;
+  }
+
+  const memberId = @ViewBag.MemberId;
+
+  const formData = new FormData();
+  formData.append('staffId', selectedStaffId);
+  formData.append('date', selectedDate);
+  formData.append('startHHmm', selectedTimeSlot);
+  formData.append('memberId', memberId);
+  formData.append('slotMinutes', '120');
+  formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]')?.value || '');
+
+  fetch('/Booking/Book', {
+    method: 'POST',
+    body: formData
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.message) {
+        alert('✅ ' + data.message);
+        window.location.href = '/Profile/Profile';
+      } else {
+        alert('❌ Randevu alınamadı');
+      }
+    })
+    .catch(error => {
+      console.error('Error booking appointment:', error);
+      alert('❌ Bir hata oluştu');
+    });
+});
+</script>
+
+
+@Html.AntiForgeryToken()

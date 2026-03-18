@@ -1,0 +1,31 @@
+@* Views/Shared/_WizardSteps.cshtml *@
+@model int
+@{
+    var step = Model; // 1..5
+}
+<style>
+.wizard-steps{display:flex;gap:.75rem;margin-bottom:1rem}
+.wizard-steps .dot{width:28px;height:28px;border-radius:50%;
+  display:grid;place-items:center;font-weight:600;border:2px solid #cbd5e1}
+.wizard-steps .active{background:#00754A;color:#fff;border-color:#00754A}
+.wizard-steps .label{font-size:.9rem;margin-top:.25rem;color:#334155}
+.step{display:flex;flex-direction:column;align-items:center}
+</style>
+
+<div class="wizard-steps">
+  <div class="step">
+    <div class="dot @(step >= 1 ? "active" : "")">1</div><div class="label">Telefon</div>
+  </div>
+  <div class="step">
+    <div class="dot @(step >= 2 ? "active" : "")">2</div><div class="label">Salon</div>
+  </div>
+  <div class="step">
+    <div class="dot @(step >= 3 ? "active" : "")">3</div><div class="label">Membership</div>
+  </div>
+  <div class="step">
+    <div class="dot @(step >= 4 ? "active" : "")">4</div><div class="label">Bilgiler</div>
+  </div>
+  <div class="step">
+    <div class="dot @(step >= 5 ? "active" : "")">5</div><div class="label">Özet</div>
+  </div>
+</div>

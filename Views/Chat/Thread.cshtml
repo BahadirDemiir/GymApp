@@ -1,0 +1,80 @@
+@model List<GymAppFresh.Models.ChatMessage>
+@{
+    Layout = "_Layout";
+    var threadId = (int)ViewBag.ThreadId;
+    var staff = ViewBag.Staff;
+}
+<div class="container py-3">
+  <div class="card shadow-sm">
+    <div class="card-header d-flex align-items-center gap-2">
+      <div class="fw-semibold">PT ile Mesajlaşma</div>
+      <div class="ms-auto small text-muted">Thread #@threadId</div>
+    </div>
+
+    <div id="msgWrap" class="card-body" style="height:60vh; overflow:auto;">
+      @foreach (var m in Model)
+      {
+        var mine = m.SenderType == GymAppFresh.Models.ChatSenderType.Member;
+        <div class="d-flex mb-2 @(mine?"justify-content-end":"justify-content-start")">
+          <div class="px-3 py-2 rounded-3 @(mine?"bg-primary text-white":"bg-light")" style="max-width:70%">
+            @m.Body
+            <div class="small text-opacity-75 mt-1">@m.CreatedAt.ToLocalTime()</div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="card-footer">
+      <form id="sendForm" class="d-flex gap-2">
+        <input id="msgInput" class="form-control" placeholder="Mesaj yaz..." />
+        <button class="btn btn-primary" type="submit">Gönder</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+<script>
+const threadId = @threadId;
+const msgWrap  = document.getElementById("msgWrap");
+const form     = document.getElementById("sendForm");
+const input    = document.getElementById("msgInput");
+
+function appendMsg(m){
+  const mine = (m.sender === "Member"); // member view için
+  const row = document.createElement("div");
+  row.className = "d-flex mb-2 " + (mine ? "justify-content-end":"justify-content-start");
+  row.innerHTML = `<div class="px-3 py-2 rounded-3 ${mine?"bg-primary text-white":"bg-light"}" style="max-width:70%">
+      ${m.body.replaceAll("<","&lt;")}
+      <div class="small text-opacity-75 mt-1">${new Date(m.createdAt).toLocaleString()}</div>
+    </div>`;
+  msgWrap.appendChild(row);
+  msgWrap.scrollTop = msgWrap.scrollHeight;
+}
+
+// SignalR
+const conn = new signalR.HubConnectionBuilder().withUrl("/hubs/chat").withAutomaticReconnect().build();
+
+conn.on("ReceiveMessage", (m) => appendMsg(m));
+
+conn.start().then(() => {
+  conn.invoke("JoinThread", threadId);
+});
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const txt = input.value.trim();
+  if(!txt) return;
+  const clientGuid = crypto.randomUUID();
+  // optimistic UI
+  appendMsg({sender:"Member", body: txt, createdAt: new Date().toISOString()});
+  input.value = "";
+  try {
+    await conn.invoke("SendMessage", threadId, txt, clientGuid);
+  } catch(err) {
+    alert("Mesaj gönderilemedi: " + (err?.message || err));
+  }
+});
+</script>
+}

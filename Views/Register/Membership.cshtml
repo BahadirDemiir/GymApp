@@ -1,0 +1,453 @@
+@* Views/Register/Membership.cshtml *@
+@model RegisterWizardVM
+@{
+    ViewData["Title"] = "Kayıt - Membership";
+    var memberships = ViewBag.Memberships as IEnumerable<dynamic>;
+}
+@await Html.PartialAsync("_WizardSteps", Model.CurrentStep)
+
+<div class="membership-selection-container">
+  <div class="membership-selection-card">
+    <h1 class="membership-title">Kendine en uygun üyelik paketini seç</h1>
+    
+    <!-- Payment Frequency Toggle -->
+    <div class="payment-toggle">
+      <div class="toggle-container">
+        <button type="button" class="toggle-btn active" data-frequency="annual">YILLIK</button>
+        <button type="button" class="toggle-btn" data-frequency="monthly">AYLIK</button>
+      </div>
+    </div>
+
+    <!-- Payment Options -->
+    <div class="payment-options">
+      <div class="payment-option">
+        <label class="payment-option-label">
+          <input type="radio" name="PaymentType" value="monthly" checked class="payment-radio">
+          <span class="radio-custom"></span>
+          <div class="payment-option-content">
+            <div class="payment-option-title">Aydan Aya</div>
+            <div class="payment-option-desc">12 ay boyunca her ay aylık ücreti öde</div>
+          </div>
+        </label>
+      </div>
+      
+      <div class="payment-option">
+        <label class="payment-option-label">
+          <input type="radio" name="PaymentType" value="upfront" class="payment-radio">
+          <span class="radio-custom"></span>
+          <div class="payment-option-content">
+            <div class="payment-option-title">Peşin</div>
+            <div class="payment-option-desc">6 aya varan taksit imkanıyla yıllık ücreti öde</div>
+            <div class="discount-badge">%25'E VARAN İNDİRİM</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Membership Packages -->
+    <form asp-action="Membership" method="post" class="membership-form">
+      @Html.AntiForgeryToken()
+      
+      <div class="membership-packages">
+        @foreach (var m in memberships)
+        {
+          <div class="membership-package @(m.Name == "Gold" ? "popular" : "")">
+            @if (m.Name == "Gold")
+            {
+              <div class="popular-badge">EN POPÜLER</div>
+            }
+            
+            <div class="package-header">
+              <h3 class="package-name">@m.Name</h3>
+              <div class="package-price">
+                <span class="current-price">@m.Price TL /AYDA</span>
+                <span class="original-price">@(m.Price * 2) TL</span>
+              </div>
+            </div>
+            
+            <div class="package-features">
+              @if (m.Name == "Classic")
+              {
+                <div class="feature">Üye Olunan Kulübü Sınırsız Kullanım</div>
+                <div class="feature">MAC+ ile Grup Derslerine 2 Gün Erken Rezervasyon</div>
+                <div class="feature">Kişisel Antrenör Desteği</div>
+                <div class="feature">7/24 Kulüp Erişimi</div>
+              }
+              else if (m.Name == "Gold")
+              {
+                <div class="feature">Tüm MACFit'leri Sınırsız Kullanım</div>
+                <div class="feature">MAC+ ile Grup Derslerine 4 Gün Erken Rezervasyon</div>
+                <div class="feature">Kişisel Antrenör Desteği</div>
+                <div class="feature">7/24 Kulüp Erişimi</div>
+                <div class="feature">Özel Etkinliklere Katılım</div>
+              }
+              else if (m.Name == "Platinum")
+              {
+                <div class="feature">Tüm MAC/One ve MACFit'leri Sınırsız Kullanım</div>
+                <div class="feature">MAC+ ile Grup Derslerine 4 Gün Erken Rezervasyon</div>
+                <div class="feature">Kişisel Antrenör Desteği</div>
+                <div class="feature">7/24 Kulüp Erişimi</div>
+                <div class="feature">Özel Etkinliklere Katılım</div>
+                <div class="feature">VIP Alanlara Erişim</div>
+              }
+            </div>
+            
+            <div class="package-action">
+              @if (Model.SelectedMembershipId == m.MembershipId)
+              {
+                <input type="radio" name="SelectedMembershipId" value="@m.MembershipId" checked class="package-radio" id="package-@m.MembershipId">
+              }
+              else
+              {
+                <input type="radio" name="SelectedMembershipId" value="@m.MembershipId" class="package-radio" id="package-@m.MembershipId">
+              }
+              <label for="package-@m.MembershipId" class="package-select-btn">PAKETİ SEÇ</label>
+            </div>
+          </div>
+        }
+      </div>
+      
+      <div class="form-actions">
+        <a asp-action="Gym" class="btn btn-secondary">Geri</a>
+        <button class="btn btn-primary" type="submit">Devam Et</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .membership-selection-container {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+  
+  .membership-selection-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 3rem;
+    max-width: 1200px;
+    width: 100%;
+  }
+  
+  .membership-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .payment-toggle {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  
+  .toggle-container {
+    display: flex;
+    background-color: #f1f3f4;
+    border-radius: 8px;
+    padding: 4px;
+  }
+  
+  .toggle-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .toggle-btn.active {
+    background-color: white;
+    color: #1a1a1a;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .payment-options {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    justify-content: center;
+  }
+  
+  .payment-option {
+    flex: 1;
+    max-width: 300px;
+  }
+  
+  .payment-option-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .payment-option-label:hover {
+    border-color: #d1d5db;
+  }
+  
+  .payment-radio {
+    display: none;
+  }
+  
+  .payment-radio:checked + .radio-custom {
+    background-color: #dc2626;
+    border-color: #dc2626;
+  }
+  
+  .payment-radio:checked + .radio-custom::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    background-color: white;
+    border-radius: 50%;
+  }
+  
+  .radio-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #d1d5db;
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  
+  .payment-option-content {
+    flex: 1;
+  }
+  
+  .payment-option-title {
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 0.25rem;
+  }
+  
+  .payment-option-desc {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .discount-badge {
+    background: linear-gradient(135deg, #8b5cf6, #a855f7);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    display: inline-block;
+  }
+  
+  .membership-packages {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .membership-package {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    transition: all 0.2s ease;
+  }
+  
+  .membership-package:hover {
+    border-color: #d1d5db;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  .membership-package.popular {
+    border-color: #8b5cf6;
+    transform: scale(1.05);
+  }
+  
+  .popular-badge {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #8b5cf6, #a855f7);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .package-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .package-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+  }
+  
+  .package-price {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .current-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  
+  .original-price {
+    font-size: 0.875rem;
+    color: #9ca3af;
+    text-decoration: line-through;
+  }
+  
+  .package-features {
+    margin-bottom: 1.5rem;
+  }
+  
+  .feature {
+    padding: 0.5rem 0;
+    color: #374151;
+    font-size: 0.875rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .feature:last-child {
+    border-bottom: none;
+  }
+  
+  .package-action {
+    text-align: center;
+  }
+  
+  .package-radio {
+    display: none;
+  }
+  
+  .package-select-btn {
+    display: inline-block;
+    background-color: #dc2626;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .package-select-btn:hover {
+    background-color: #b91c1c;
+    transform: translateY(-1px);
+  }
+  
+  .package-radio:checked + .package-select-btn {
+    background-color: #059669;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  
+  .btn {
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+  }
+  
+  .btn-primary {
+    background-color: #3b82f6;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+  
+  .btn-secondary {
+    background-color: #6b7280;
+    color: white;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #4b5563;
+    transform: translateY(-1px);
+  }
+  
+    
+    .payment-options {
+      flex-direction: column;
+    }
+    
+    .membership-package.popular {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  // Payment frequency toggle
+  document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+  
+  // Package selection
+  document.querySelectorAll('.package-radio').forEach(radio => {
+    radio.addEventListener('change', function() {
+      document.querySelectorAll('.package-radio').forEach(r => {
+        const btn = r.nextElementSibling;
+        btn.style.backgroundColor = '#dc2626';
+      });
+      
+      if (this.checked) {
+        const btn = this.nextElementSibling;
+        btn.style.backgroundColor = '#059669';
+      }
+    });
+  });
+</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

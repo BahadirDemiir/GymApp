@@ -1,0 +1,136 @@
+/* Shared Components Styles */
+
+/* Header Section */
+.page-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Search Container */
+.search-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
+}
+
+/* Filter Chips */
+.filter-chip {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #6c757d;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.filter-chip:hover, .filter-chip.active {
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+/* Card Components */
+.item-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.item-card:hover {
+    transform: scale(1.01);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.item-image {
+    height: 240px;
+    object-fit: cover;
+}
+
+/* Badges */
+.category-badge {
+    background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+}
+
+.level-badge {
+    background: linear-gradient(135deg, #6f42c1, #5a32a3);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+}
+
+.specialty-badge {
+    background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+}
+
+.price-tag {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 1.1rem;
+}
+
+/* Rating Stars */
+.rating-stars {
+    color: #ffc107;
+}
+
+/* Meta Items */
+.meta-item {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.meta-item i {
+    color: #0d6efd;
+    margin-right: 0.5rem;
+}
+
+.stats-item {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.stats-item i {
+    color: #0d6efd;
+    margin-right: 0.5rem;
+}
+
+/* Skeleton Loading */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 1rem;
+}

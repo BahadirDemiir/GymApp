@@ -1,0 +1,217 @@
+@model IEnumerable<GymAppFresh.Models.Coach>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/shared-components.css" asp-append-version="true" />
+}
+
+<!-- Slim Header Section -->
+<section class="page-header py-4">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h1 class="display-5 fw-bold text-dark mb-2">Koçlarımız</h1>
+                <p class="lead text-muted mb-0">Deneyimli ve uzman eğitmenlerimizle fitness hedeflerinize ulaşın</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search and Filters Section -->
+@{
+    ViewData["SearchPlaceholder"] = "Koç, uzmanlık, seviye ara...";
+    ViewData["SortOptions"] = new Dictionary<string, string> {
+        { "rating", "Puana Göre" },
+        { "experience", "Deneyime Göre" },
+        { "students", "Öğrenci Sayısına Göre" },
+        { "name", "İsme Göre" }
+    };
+}
+@await Html.PartialAsync("_SearchFilters")
+
+<!-- Coaches Grid Section -->
+<section class="pb-5">
+    <div class="container">
+        <!-- Loading Skeleton (initially hidden) -->
+        <div id="skeletonLoader" class="row g-4" style="display: none;">
+            @for (int i = 0; i < 6; i++)
+            {
+                <div class="col-xl-4 col-md-6">
+                    <div class="card item-card h-100">
+                        <div class="skeleton" style="height: 240px;"></div>
+                        <div class="card-body p-4">
+                            <div class="skeleton mb-3" style="height: 24px; width: 60%;"></div>
+                            <div class="skeleton mb-3" style="height: 20px; width: 40%;"></div>
+                            <div class="skeleton mb-3" style="height: 16px; width: 80%;"></div>
+                            <div class="skeleton mb-3" style="height: 16px; width: 70%;"></div>
+                            <div class="d-flex gap-2 mt-auto">
+                                <div class="skeleton" style="height: 38px; flex: 1;"></div>
+                                <div class="skeleton" style="height: 38px; flex: 1;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Coaches Grid -->
+        <div id="coachesGrid" class="row g-4">
+            @foreach (var coach in Model)
+            {
+                <div class="col-xl-4 col-md-6 coach-item item" data-specialty="@coach.Category.Name" data-name="@coach.Name.ToLower()">
+                    <div class="card item-card h-100 shadow-sm">
+                        <!-- Coach Image -->
+                        <div class="position-relative">
+                            <img src="@coach.Image" class="item-image w-100" alt="@coach.Name">
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="specialty-badge">@coach.Category.Name</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Card Body -->
+                        <div class="card-body d-flex flex-column p-4">
+                            <!-- Coach Name and Rating -->
+                            <div class="mb-3">
+                                <h5 class="card-title fw-bold text-dark mb-2">@coach.Name</h5>
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <div class="rating-stars">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= (int)coach.Rating)
+                                            {
+                                                <i class="bi bi-star-fill"></i>
+                                            }
+                                            else if (i - 0.5m <= coach.Rating)
+                                            {
+                                                <i class="bi bi-star-half"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-star"></i>
+                                            }
+                                        }
+                                    </div>
+                                    <span class="fw-semibold text-dark">@coach.Rating</span>
+                                    <span class="text-muted small">(@coach.ReviewCount değerlendirme)</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Stats -->
+                            <div class="mb-4">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="mt-auto d-flex gap-2">
+                                <button type="button" class="btn btn-primary" 
+                                        onclick="openCoachDetailsModal('@coach.Id', '@coach.Name', '@coach.Category.Name', '@coach.Bio', '@coach.ExperienceYears', '@coach.StudentCount', '@coach.Level', '@coach.InstagramUrl')">
+                                    <i class="bi bi-info-circle me-2"></i>Detaylar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        
+        <!-- Empty State (initially hidden) -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <i class="bi bi-search"></i>
+            <h4 class="mb-3">Sonuç Bulunamadı</h4>
+            <p class="mb-4">Arama kriterlerinize uygun koç bulunamadı. Filtreleri temizleyip tekrar deneyin.</p>
+            <button class="btn btn-primary" onclick="clearFilters()">
+                <i class="bi bi-arrow-clockwise me-2"></i>Filtreleri Temizle
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Coach Details Modal -->
+<div class="modal fade" id="coachDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Koç Detayları</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-primary">Ad Soyad:</label>
+                    <p class="mb-0" id="modalCoachName"></p>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-primary">Uzmanlık Alanı:</label>
+                    <p class="mb-0" id="modalCoachSpeciality"></p>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-primary">Biyografi:</label>
+                    <p class="mb-0" id="modalCoachBio"></p>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label class="form-label fw-bold text-primary">Deneyim:</label>
+                        <p class="mb-0" id="modalCoachExperience"></p>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-bold text-primary">Seviye:</label>
+                        <p class="mb-0" id="modalCoachLevel"></p>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-primary">Öğrenci Sayısı:</label>
+                    <p class="mb-0" id="modalCoachStudents"></p>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-primary">İletişim:</label>
+                    <p class="mb-0">
+                        <a href="#" id="modalCoachInstagram" target="_blank" class="text-decoration-none">
+                            <i class="bi bi-instagram me-2"></i>Instagram Profili
+                        </a>
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/search-filter.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.searchFilterManager = new SearchFilterManager({
+                itemSelector: '.coach-item',
+                gridId: 'coachesGrid',
+                skeletonId: 'skeletonLoader',
+                emptyStateId: 'emptyState'
+            });
+        });
+        
+        function openCoachDetailsModal(coachId, coachName, coachSpeciality, coachBio, coachExperience, coachStudents, coachLevel, coachInstagram) {
+            document.getElementById('modalCoachName').textContent = coachName;
+            document.getElementById('modalCoachSpeciality').textContent = coachSpeciality;
+            document.getElementById('modalCoachBio').textContent = coachBio;
+            document.getElementById('modalCoachExperience').textContent = coachExperience + ' yıl';
+            document.getElementById('modalCoachStudents').textContent = coachStudents + ' öğrenci';
+            document.getElementById('modalCoachLevel').textContent = coachLevel;
+            
+            // Set Instagram link
+            const instagramLink = document.getElementById('modalCoachInstagram');
+            instagramLink.href = coachInstagram;
+            
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('coachDetailsModal'));
+            modal.show();
+        }
+    </script>
+}

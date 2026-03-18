@@ -1,0 +1,112 @@
+@model List<GymAppFresh.Models.Membership>
+@{
+    ViewData["Title"] = "Üyelik Planları";
+}
+
+<div class="container">
+  <h1>Üyelik Planları</h1>
+
+  <div id="plansRow" class="row g-4 align-items-stretch">
+    @foreach (var membership in Model)
+    {
+      <div class="col-md-4 d-flex">
+        <div class="card flex-fill d-flex flex-column">
+          <div class="card-body">
+            <h2 class="card-text">@membership.PacketType</h2>
+            <p class="card-text">@membership.Price TL/AYDA</p>
+            <a href="@Url.Action("Buy","Membership",new { membershipId=(int)membership.PacketType })" class="btn btn-primary">Satın Al</a>
+          </div>
+
+          <div class="card-footer">
+            @if(@membership.Name=="Classic") {
+              <p class="card-text">Üye olunan kulübe sınırsız kullanım</p>
+              <p class="card-text">Online kurslara 2 gün erken rezervasyon fırsatı</p>
+              <p class="card-text">Üyelik paketine göre ücretsiz dondurma fırsatı</p>
+              <p class="card-text">Online kurslarda %40 indirim</p>
+            }
+            @if(@membership.Name=="Gold") {
+              <p class="card-text">Tüm kulüplerde sınırsız kullanım</p>
+              <p class="card-text">Online kurslara 4 gün erken rezervasyon fırsatı</p>
+              <p class="card-text">Üyelik paketine göre ücretsiz dondurma fırsatı</p>
+              <p class="card-text">Online kurslarda %40 indirim</p>
+              <p class="card-text">Ayda 2 misafir getirme hakkı</p>
+              <p class="card-text">Alışveriş mağazasında %10 indirim</p>
+            }
+            @if(@membership.Name=="Platinum") {
+              <p class="card-text">Tüm kulüplerde sınırsız kullanım</p>
+              <p class="card-text">Online kurslara 6 gün erken rezervasyon fırsatı</p>
+              <p class="card-text">Üyelik paketine göre ücretsiz dondurma fırsatı</p>
+              <p class="card-text">Online kurslarda %40 indirim</p>
+              <p class="card-text">Ayda 4 misafir getirme hakkı</p>
+              <p class="card-text">Alışveriş mağazasında %20 indirim</p>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <p id="promoLabel" class="mt-4" style="cursor:pointer; color:#4a2dbf; text-decoration:underline;">
+    Promosyon kodunu giriniz
+  </p>
+</div>
+
+<div class="modal fade" id="promoModal" tabindex="-1" aria-labelledby="promoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        <div class="modal-body">
+            <label for="promoInput" class="form-label fw-bold fs-4">
+                Promosyon kodunu gir
+            </label>
+            <input type="text" id="promoInput" class="form-control" placeholder="Promosyon kodu" />
+        </div>
+      <div class="modal-footer">
+        <button id="applyPromo" type="button" class="btn btn-primary" data-bs-dismiss="modal">Uygula</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .card-footer .card-text { margin-bottom: .75rem; }
+  .card-footer .card-text:last-child { margin-bottom: 0; }
+</style>
+
+<script>
+  // Kart üst/alt equalizer (senin kodun kalsın)
+  (function () {
+    function equalize(selector) {
+      const els = document.querySelectorAll(selector);
+      let max = 0;
+      els.forEach(el => { el.style.minHeight = ''; });
+      els.forEach(el => { max = Math.max(max, el.offsetHeight); });
+      els.forEach(el => { el.style.minHeight = max + 'px'; });
+    }
+    function run() {
+      equalize('#plansRow .card-body');
+      equalize('#plansRow .card-footer');
+    }
+    let t;
+    window.addEventListener('load', run);
+    window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(run, 150); });
+  })();
+
+  // === Modal tetikleyici: LABEL ===
+  document.addEventListener('DOMContentLoaded', function () {
+    const label   = document.getElementById('promoLabel');
+    const modalEl = document.getElementById('promoModal');
+    const modal   = new bootstrap.Modal(modalEl);
+
+    label.addEventListener('click', () => modal.show());
+
+    // İsteğe bağlı: Uygula butonu örnek davranışı
+    document.getElementById('applyPromo').addEventListener('click', () => {
+      const val = document.getElementById('promoInput').value.trim();
+      if (!val) return;
+      // burada kodu server’a gönderebilirsin; şimdilik console:
+      console.log('Applied promo:', val);
+    });
+  });
+
+</script>

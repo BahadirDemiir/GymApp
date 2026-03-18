@@ -1,0 +1,429 @@
+@* Views/Register/Details.cshtml *@
+@model RegisterWizardVM
+@await Html.PartialAsync("_WizardSteps", Model.CurrentStep)
+
+<div class="details-container">
+  <div class="details-content">
+    <!-- Left Section - Form -->
+    <div class="form-section">
+      <div class="form-card">
+        <h1 class="form-title">Hesap oluştur</h1>
+        
+        <form asp-action="Details" method="post" class="details-form">
+          @Html.AntiForgeryToken()
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Ad*</label>
+              <input asp-for="FirstName" class="form-input" placeholder="Adınızı girin"/>
+      <span class="text-danger" asp-validation-for="FirstName"></span>
+    </div>
+            <div class="form-group">
+              <label class="form-label">Soyad*</label>
+              <input asp-for="LastName" class="form-input" placeholder="Soyadınızı girin"/>
+      <span class="text-danger" asp-validation-for="LastName"></span>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Ülke Kodu</label>
+              <select class="form-input country-code-select">
+                <option value="+90" selected>🇹🇷 +90</option>
+                <option value="+1">🇺🇸 +1</option>
+                <option value="+49">🇩🇪 +49</option>
+                <option value="+33">🇫🇷 +33</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Telefon Numarası*</label>
+              <input asp-for="Phone" class="form-input" placeholder="(5xx) xxx xx xx"/>
+              <span class="text-danger" asp-validation-for="Phone"></span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">E-posta Adresi*</label>
+            <input asp-for="Email" class="form-input" placeholder="E-posta adresinizi girin"/>
+            <span class="text-danger" asp-validation-for="Email"></span>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Şifre*</label>
+            <input asp-for="Password" type="password" class="form-input" placeholder="Şifrenizi girin"/>
+            <span class="text-danger" asp-validation-for="Password"></span>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Right Section - Summary -->
+    <div class="summary-section">
+      <div class="summary-card">
+        <h2 class="summary-title">Seçtiğin Kulüp ve Paket</h2>
+        
+        <div class="summary-content">
+          <div class="summary-item">
+            <div class="summary-label">Kulüp</div>
+            <div class="summary-value">
+              @if (!string.IsNullOrEmpty(Model.SelectedGymName))
+              {
+                <text>@Model.SelectedGymName</text>
+              }
+              else
+              {
+                <text>Kulüp seçilmedi</text>
+              }
+            </div>
+          </div>
+          
+          <div class="summary-item">
+            <div class="summary-label">Paket</div>
+            <div class="summary-value">
+              @if (!string.IsNullOrEmpty(Model.SelectedMembershipName))
+              {
+                <text>@Model.SelectedMembershipName</text>
+              }
+              else
+              {
+                <text>Paket seçilmedi</text>
+              }
+            </div>
+          </div>
+          
+          <div class="summary-item">
+            <div class="summary-label">Fiyat</div>
+            <div class="summary-value">
+              @if (Model.SelectedMembershipPrice.HasValue)
+              {
+                <text>@Model.SelectedMembershipPrice.Value.ToString("N2") TL</text>
+              }
+              else
+              {
+                <text>Fiyat belirlenmedi</text>
+              }
+            </div>
+          </div>
+        
+        <button class="approve-btn" type="submit" form="details-form">ONAYLA</button>
+      </div>
+    </div>
+  </div>
+  </div>
+
+<style>
+  .details-container {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    padding: 2rem 1rem;
+  }
+  
+  .details-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+  
+  .form-section {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 3rem;
+  }
+  
+  .form-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .details-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .form-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.25rem;
+  }
+  
+  .form-input {
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background-color: white;
+    color: #374151;
+    transition: border-color 0.2s ease;
+    appearance: none;
+  }
+  
+  .form-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+  }
+  
+  .form-input:hover {
+    border-color: #9ca3af;
+  }
+  
+  .country-select,
+  .country-code-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+  
+  .gender-options {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .gender-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+  
+  .gender-radio {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #d1d5db;
+    border-radius: 50%;
+    position: relative;
+    appearance: none;
+    cursor: pointer;
+  }
+  
+  .gender-radio:checked {
+    border-color: #3b82f6;
+    background-color: #3b82f6;
+  }
+  
+  .gender-radio:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    background-color: white;
+    border-radius: 50%;
+  }
+  
+  .gender-label {
+    font-size: 0.9rem;
+    color: #374151;
+    cursor: pointer;
+  }
+  
+  .summary-section {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .summary-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    position: sticky;
+    top: 2rem;
+  }
+  
+  .summary-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  .summary-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .summary-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
+  
+  .summary-value {
+    font-size: 1rem;
+    color: #1a1a1a;
+    font-weight: 600;
+  }
+  
+  .summary-price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .price-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .price-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  
+  .approve-btn {
+    width: 100%;
+    background-color: #dc2626;
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+  }
+  
+  .approve-btn:hover {
+    background-color: #b91c1c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  }
+  
+  .text-danger {
+    color: #dc2626;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+    
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+    
+    .form-card {
+      padding: 2rem;
+    }
+    
+    .summary-card {
+      position: static;
+    }
+  }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.details-form');
+            const submitBtn = document.querySelector('.approve-btn');
+            
+            // Form submission handling
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    console.log('[CLIENT] Details form submitting...');
+                    const firstName = document.querySelector('input[name="FirstName"]').value;
+                    const lastName = document.querySelector('input[name="LastName"]').value;
+                    const email = document.querySelector('input[name="Email"]').value;
+                    const password = document.querySelector('input[name="Password"]').value;
+                    console.log('[CLIENT] FirstName:', firstName);
+                    console.log('[CLIENT] LastName:', lastName);
+                    console.log('[CLIENT] Email:', email);
+                    console.log('[CLIENT] Password:', password);                
+                    if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim()) {
+                        console.log('[CLIENT] Some fields are empty, preventing submit');
+                        e.preventDefault();
+                        return false;
+                    } 
+                    
+                    console.log('[CLIENT] Form should submit now');
+                });
+            }
+            
+            // Submit button handling
+            if (submitBtn) {
+                submitBtn.addEventListener('click', function(e) {
+                    console.log('[CLIENT] Submit button clicked');
+                    // Trigger form submission
+                    if (form) {
+                        form.submit();
+                    }
+                });
+            }
+            
+            // Phone number formatting
+            const phoneInput = document.querySelector('input[name="Phone"]');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length > 0) {
+                        if (value.length <= 3) {
+                            value = `(${value}`;
+                        } else if (value.length <= 6) {
+                            value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+                        } else if (value.length <= 8) {
+                            value = `(${value.slice(0, 3)}) ${value.slice(3, 6)} ${value.slice(6)}`;
+                        } else {
+                            value = `(${value.slice(0, 3)}) ${value.slice(3, 6)} ${value.slice(6, 8)} ${value.slice(8, 10)}`;
+                        }
+                    }
+                    e.target.value = value;
+                });
+            }
+            
+            // TC Kimlik Numarası formatting
+            const tcInput = document.querySelector('input[placeholder*="TC Kimlik"]');
+            if (tcInput) {
+                tcInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length > 11) {
+                        value = value.slice(0, 11);
+                    }
+                    e.target.value = value;
+                });
+            }
+        });
+    </script>
+}

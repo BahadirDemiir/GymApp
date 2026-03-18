@@ -1,0 +1,44 @@
+@model GymAppFresh.Models.Member
+
+<div class="container d-flex justify-content-center">
+    <div class="w-100" style="max-width: 500px;">
+        <h2 class="text-center mb-4">Kayıt Ol</h2>
+        
+        <form asp-action="Register" method="post">
+            
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label">Ad Soyad</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">E-posta</label>
+                <input asp-for="Email" type="email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label">Şifre</label>
+                <input asp-for="Password" type="password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="Phone" class="form-label">Telefon</label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100 mb-3">Kayıt Ol</button>
+        </form>
+
+        <div class="text-center">
+            <p class="mb-0">Zaten hesabınız var mı? <a asp-action="Login" class="text-decoration-none">Giriş Yap</a></p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+} 

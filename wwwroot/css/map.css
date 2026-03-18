@@ -1,0 +1,513 @@
+/* ===== Starbucks-ish Theme (compact) ===== */
+:root {
+  --sbx-green: #00754a;
+  --sbx-deep: #1e3932;
+  --sbx-cream: #f7f7f5;
+  --sbx-white: #fff;
+  --sbx-line: #e8e8e4;
+  --sbx-text: #1f2937;
+  --sbx-sub: #6b7280;
+  --radius-xl: 22px;
+  --chip-br: 12px;
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 18px 40px rgba(0, 0, 0, 0.14);
+  --panel-width: 420px;
+  --panel-height: 560px;
+  --panel-gap: 16px;
+}
+body {
+  background: var(--sbx-cream);
+  color: var(--sbx-text);
+}
+
+/* Map wrapper */
+.map-wrap {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 80px);
+}
+#trMap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-xl);
+  filter: brightness(1.02) contrast(0.95) saturate(0.85);
+  overflow: hidden;
+}
+
+/* Leaflet controls */
+.leaflet-control-zoom a {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(30, 57, 50, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  color: var(--sbx-text);
+}
+.leaflet-control-zoom a:hover {
+  background: #fff;
+}
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--sbx-line);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+  padding: 2px 6px;
+}
+/* Zoom konumu: paneli hesaba kat */
+.leaflet-top.leaflet-left {
+  top: var(--panel-gap);
+  left: calc(var(--panel-gap) + var(--panel-width) + var(--panel-gap));
+  transition: left 0.3s ease;
+}
+
+/* Panel kapalıyken zoom kontrolü sola gelsin */
+.map-wrap.panel-collapsed .leaflet-top.leaflet-left {
+  left: var(--panel-gap);
+}
+
+/* Overlay panel */
+.overlay-panel {
+  position: absolute;
+  top: var(--panel-gap);
+  left: var(--panel-gap);
+  width: var(--panel-width);
+  height: var(--panel-height);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.96),
+    rgba(255, 255, 255, 0.92)
+  );
+  border: 1px solid rgba(30, 57, 50, 0.06);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: saturate(1.05) blur(10px);
+  overflow: hidden;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.overlay-panel.collapsed {
+  transform: translateX(-110%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.panel-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(30, 57, 50, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.search-wrap {
+  position: relative;
+  flex: 1;
+}
+.search-wrap input {
+  width: 100%;
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid rgba(30, 57, 50, 0.1);
+  background: #fff;
+  padding: 0 40px 0 14px;
+  outline: 0;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.04),
+    0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.search-wrap input::placeholder {
+  color: #9aa3ad;
+}
+.search-wrap input:focus {
+  border-color: #9ed2bf;
+  box-shadow: 0 0 0 4px rgba(0, 117, 74, 0.15);
+}
+.search-wrap .bi-search {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.05rem;
+  opacity: 0.6;
+}
+.panel-actions {
+  position: relative;
+}
+
+.panel-actions .dropdown {
+  position: relative;
+}
+
+/* Harita stil dropdown stilleri */
+.panel-actions .dropdown-menu {
+  min-width: 200px;
+  border: 1px solid rgba(30, 57, 50, 0.1);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  margin-top: 5px;
+}
+
+.panel-actions .dropdown-menu.show {
+  display: block;
+}
+
+.panel-actions .dropdown-item {
+  padding: 10px 16px;
+  color: var(--sbx-text);
+  border-bottom: 1px solid rgba(30, 57, 50, 0.05);
+  transition: all 0.2s ease;
+}
+
+.panel-actions .dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.panel-actions .dropdown-item:hover {
+  background: rgba(0, 117, 74, 0.08);
+  color: var(--sbx-green);
+}
+
+.panel-actions .dropdown-item.active {
+  background: var(--sbx-green);
+  color: white;
+}
+
+.panel-actions .dropdown-item.active:hover {
+  background: var(--sbx-deep);
+}
+
+/* Panel body */
+.panel-body {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 10px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(30, 57, 50, 0.25) transparent;
+}
+.panel-body::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.panel-body::-webkit-scrollbar-thumb {
+  background: rgba(30, 57, 50, 0.25);
+  border-radius: 999px;
+}
+
+/* Tab content scrolling */
+.tab-content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 10px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(30, 57, 50, 0.25) transparent;
+}
+
+.tab-content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.tab-content::-webkit-scrollbar-thumb {
+  background: rgba(30, 57, 50, 0.25);
+  border-radius: 999px;
+}
+
+.tab-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Ensure the overlay panel content area is scrollable */
+.overlay-panel > .tab-buttons {
+  flex: 0 0 auto;
+}
+
+.overlay-panel > .tab-content {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Store item */
+.store-item {
+  background: #fff;
+  border: 1px solid rgba(30, 57, 50, 0.07);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin: 8px 0;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.store-item:hover {
+  background: #fcfcfc;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.09);
+  transform: translateY(-1px);
+}
+.store-title {
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  line-height: 1.2;
+}
+.store-sub {
+  color: #707a84;
+  line-height: 1.35;
+}
+.store-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  color: #333;
+}
+.store-actions i {
+  font-size: 1rem;
+  opacity: 0.75;
+}
+.store-actions i:hover {
+  opacity: 0.95;
+}
+
+/* City menu */
+.dropdown-menu-city {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  z-index: 1002;
+  background: #fff;
+  border: 1px solid rgba(30, 57, 50, 0.08);
+  border-radius: 14px;
+  min-width: 240px;
+  padding: 8px;
+  box-shadow: var(--shadow-md);
+}
+.dropdown-title {
+  font-weight: 700;
+  font-size: 0.92rem;
+  padding: 6px 10px;
+}
+.dropdown-divider {
+  height: 1px;
+  background: var(--sbx-line);
+  margin: 6px 0;
+}
+.dropdown-item {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.dropdown-item:hover {
+  background: #f3f5f4;
+}
+.dropdown-item.active {
+  font-weight: 700;
+}
+
+/* Pins - Light Theme (Varsayılan) */
+.sbx-pin.light-theme .pin {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--sbx-green);
+  box-shadow: 0 0 0 4px rgba(0, 117, 74, 0.18), 0 4px 10px rgba(0, 0, 0, 0.15);
+  border: 2px solid #fff;
+}
+
+.inactive-marker.light-theme .pin-inactive {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #999;
+  border: 2px solid #666;
+}
+
+/* Dark Theme Markers */
+.sbx-pin.dark-theme .pin {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #00d4aa;
+  box-shadow: 0 0 0 4px rgba(0, 212, 170, 0.3), 0 4px 15px rgba(0, 0, 0, 0.4);
+  border: 2px solid #fff;
+}
+
+.inactive-marker.dark-theme .pin-inactive {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #666;
+  border: 2px solid #444;
+}
+
+/* Satellite Theme Markers */
+.sbx-pin.satellite-theme .pin {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ff6b35;
+  box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.25), 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 2px solid #fff;
+}
+
+.inactive-marker.satellite-theme .pin-inactive {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ffa500;
+  border: 2px solid #fff;
+}
+
+/* Streets Theme Markers */
+.sbx-pin.streets-theme .pin {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0 4px 10px rgba(0, 0, 0, 0.15);
+  border: 2px solid #fff;
+}
+
+.inactive-marker.streets-theme .pin-inactive {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #6b7280;
+  border: 2px solid #374151;
+}
+
+.leaflet-marker-icon.bounce {
+  animation: bounce 0.7s ease;
+}
+
+/* Panel Handle (Kenar kulakçığı) */
+.panel-handle {
+  position: absolute;
+  top: calc(var(--panel-gap) + 40px);
+  left: calc(var(--panel-gap) + var(--panel-width) - 18px);
+  z-index: 1101;
+  width: 36px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid rgba(30, 57, 50, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.panel-handle:hover {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+  transform: scale(1.05);
+}
+
+.panel-handle i {
+  font-size: 1.2rem;
+  color: var(--sbx-text);
+  transition: transform 0.3s ease;
+}
+
+/* Panel kapalıyken kulakçık sol kenarda sabit dursun */
+.map-wrap.panel-collapsed .panel-handle {
+  left: var(--panel-gap);
+  border-left: 1px solid rgba(30, 57, 50, 0.1);
+  border-radius: 12px;
+}
+
+/* Sekme stilleri */
+.tab-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+.tab-btn {
+  border: none;
+  background: #eee;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.tab-btn.active {
+  background: var(--sbx-green, #00754a);
+  color: #fff;
+}
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+
+/* Yakındakiler kartları */
+.nearby-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.nearby-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  background: #fff;
+}
+.nearby-meta {
+  font-size: 0.85rem;
+  color: #666;
+}
+.nearby-actions .btn {
+  padding: 0.25rem 0.5rem;
+}
+.muted {
+  color: #888;
+  font-size: 0.9rem;
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+  35% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Mobile */
+@media (max-width: 520px) {
+  :root {
+    --panel-width: calc(100vw - 2 * var(--panel-gap));
+  }
+  .overlay-panel {
+    border-radius: 18px;
+  }
+  .leaflet-top.leaflet-left {
+    left: var(--panel-gap);
+  }
+  .panel-handle {
+    left: calc(var(--panel-gap) + var(--panel-width) - 18px);
+  }
+  .map-wrap.panel-collapsed .panel-handle {
+    left: var(--panel-gap);
+  }
+}

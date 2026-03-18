@@ -1,0 +1,178 @@
+@model GymAppFresh.Areas.Staff.Controllers.ScheduleVM
+@{
+    ViewData["Title"] = "Çalışma Programım";
+}
+
+<div class="container py-3">
+
+    @if (TempData["ok"] is string okMsg)
+    {
+        <div class="alert alert-success">@okMsg</div>
+    }
+
+    <h4 class="mb-3">Haftalık Program</h4>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <strong>Hata:</strong>
+            @Html.ValidationSummary(excludePropertyErrors: false)
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <div>@error.ErrorMessage</div>
+            }
+        </div>
+    }
+
+    <form asp-area="Staff" asp-controller="Schedule" asp-action="SaveWeekly" method="post" class="card p-3 vstack gap-2">
+  @Html.AntiForgeryToken()
+
+  <div class="row fw-semibold mb-2">
+    <div class="col-4">Gün</div>
+    <div class="col-3">Başlangıç</div>
+    <div class="col-3">Bitiş</div>
+    <div class="col-2">Durum</div>
+  </div>
+
+  @for (int i = 0; i < Model.Days.Count; i++)
+  {
+    var d = Model.Days[i];
+    <div class="row align-items-center mb-2 weekly-row">
+      <!-- KOLEKSİYON İÇİN KRİTİK -->
+      <input type="hidden" name="Days.Index" value="@i" />
+
+      <div class="col-4">
+        <span>@d.Day</span>
+        <!-- Enum'u string olarak göndermek OK (istersen sayısal da yollayabilirsin: value="@( (int)d.Day )" ) -->
+        <input type="hidden" name="Days[@i].Day" value="@d.Day" />
+      </div>
+
+      <div class="col-3">
+        <input class="form-control time-start" type="time" name="Days[@i].StartHHmm"
+               value="@d.StartHHmm" />
+      </div>
+
+      <div class="col-3">
+        <input class="form-control time-end" type="time" name="Days[@i].EndHHmm"
+               value="@d.EndHHmm" />
+      </div>
+
+      <div class="col-2">
+        <div class="btn-group w-100" role="group" aria-label="Durum">
+          <input type="radio" class="btn-check is-active"
+                 name="Days[@i].IsActive" id="act-@i-0" value="false"
+                 @(d.IsActive ? "" : "checked") onchange="toggleRow(@i)">
+          <label class="btn btn-sm btn-outline-secondary" for="act-@i-0">Pasif</label>
+
+          <input type="radio" class="btn-check is-active"
+                 name="Days[@i].IsActive" id="act-@i-1" value="true"
+                 @(d.IsActive ? "checked" : "") onchange="toggleRow(@i)">
+          <label class="btn btn-sm btn-outline-success" for="act-@i-1">Aktif</label>
+        </div>
+      </div>
+
+    </div>
+  }
+
+  <div class="d-flex justify-content-end gap-2 mt-2">
+    <button class="btn btn-primary" type="submit">Kaydet</button>
+  </div>
+</form>
+
+    <hr class="my-4" />
+
+    <h4 class="mb-3">İzin (Time Off) Ekle</h4>
+    <form asp-action="AddTimeOff" method="post" class="card p-3">
+        @Html.AntiForgeryToken()
+
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Tarih</label>
+                <input class="form-control" type="date" name="Date" required />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Başlangıç</label>
+                <input class="form-control" type="time" name="StartHHmm" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Bitiş</label>
+                <input class="form-control" type="time" name="EndHHmm" />
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">Sebep</label>
+                <input class="form-control" type="text" name="Reason" placeholder="Opsiyonel" />
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-3">
+            <button class="btn btn-outline-primary" type="submit">İzin Ekle</button>
+        </div>
+    </form>
+
+    <hr class="my-4" />
+
+    <h4 class="mb-3">İzinlerim</h4>
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Tarih</th>
+                        <th>Başlangıç</th>
+                        <th>Bitiş</th>
+                        <th>Sebep</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (Model.TimeOffs?.Any() == true)
+                {
+                    foreach (var t in Model.TimeOffs)
+                    {
+                        <tr>
+                            <td>@t.Date</td>
+                            <td>@(t.Start ?? "-")</td>
+                            <td>@(t.End ?? "-")</td>
+                            <td>@(string.IsNullOrWhiteSpace(t.Reason) ? "-" : t.Reason)</td>
+                            <td class="text-end">
+                                <form asp-action="DeleteTimeOff" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@t.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Silinsin mi?');">
+                                        Sil
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="5" class="text-muted">Kayıtlı izin bulunmuyor.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+  function toggleRow(i){
+    const row = document.querySelectorAll('.weekly-row')[i];
+    if (!row) return;
+
+    // radio'lardan true olan seçili mi?
+    const active = row.querySelector('input.is-active[value="true"]').checked;
+
+    // disabled yerine readOnly: form-data her zaman gider
+    row.querySelector('.time-start').readOnly = !active;
+    row.querySelector('.time-end').readOnly   = !active;
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.weekly-row').forEach((_, i)=> toggleRow(i));
+  });
+</script>
+}

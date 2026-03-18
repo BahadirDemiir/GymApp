@@ -1,0 +1,119 @@
+@* Views/Register/Phone.cshtml *@
+@model RegisterWizardVM
+@{
+    ViewData["Title"] = "Kayıt - Telefon";
+}
+@await Html.PartialAsync("_WizardSteps", Model.CurrentStep)
+
+<section class="mac-hero py-5"> 
+  <div class="container">
+    <h1 class="hero-title text-center mb-4">Bize katılmak için hazırsın!</h1>
+
+    <div class="mx-auto position-relative" style="max-width:760px;">
+      <div class="promo-pill">
+        Yıllık Paketlerde %25'e Varan İndirim Fırsatı!
+      </div>
+
+      <div class="card mac-card shadow-lg">
+        <div class="card-body p-4 p-md-5">
+          <h2 class="hero-copy text-center mb-4">
+            Sana özel tekliflerinden haberdar olmak için<br />
+            telefon numaranı gir
+          </h2>
+
+          <form asp-action="Phone" method="post" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="row g-3 justify-content-center">
+              <div class="col-12 col-md-8">
+                <label class="form-label visually-hidden" for="Phone">Telefon Numarası</label>
+                <input asp-for="Phone"
+                       id="Phone"
+                       class="form-control form-control-lg"
+                       placeholder="Telefon Numarası"
+                       inputmode="tel"
+                       autocomplete="tel" />
+                <span class="text-danger small" asp-validation-for="Phone"></span>
+              </div>
+            </div>
+
+            <div class="text-center mt-4">
+              <button class="btn btn-mac btn-lg px-4 text-white" type="submit">
+                ÜYELİK PAKETLERİNİ GÖR
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <p class="text-center text-muted small mt-2">
+        Kişisel verileriniz <a asp-action="Kvkk" class="text-decoration-underline">Aydınlatma Metni</a> kapsamında işlenmektedir.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  :root{ --mac-red:#E0161B; --mac-red-dark:#B61216; }
+  .mac-card{ border:0; border-radius:18px; }
+  
+  /* Daha yumuşak başlık */
+  .hero-title{
+    font-family: 'Montserrat', sans-serif;  
+    font-weight:600; /* öncekinden daha ince */
+    font-size:clamp(28px,4vw,48px);
+    color:#111;
+  }
+  .hero-copy{
+    font-family: 'Montserrat', sans-serif;  
+    font-weight:500; line-height:1.4;
+    font-size:clamp(18px,2vw,26px);
+    color:#222;
+  }
+  
+  .btn-mac{
+    background:var(--mac-red); border-color:var(--mac-red);
+    font-family: 'Montserrat', sans-serif;  
+    border-radius:999px; font-weight:700;
+    letter-spacing:.5px; text-transform:uppercase;
+  }
+  .btn-mac:hover{ background:var(--mac-red-dark); border-color:var(--mac-red-dark); }
+
+  .promo-pill{
+    position:absolute; left:50%; transform:translate(-50%,-50%);
+    font-family: 'Montserrat', sans-serif;  
+    background:#6f42c1; color:#fff; font-weight:700; font-size:.9rem;
+    padding:.4rem .9rem; border-radius:999px; white-space:nowrap; z-index:2;
+  }
+</style>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const submitBtn = document.querySelector('button[type="submit"]');
+            
+            form.addEventListener('submit', function(e) {
+                console.log('[CLIENT] Form submitting...');
+                const phoneInput = document.querySelector('input[name="Phone"]');
+                console.log('[CLIENT] Phone value:', phoneInput.value);
+                
+                // Validation kontrolü
+                if (!phoneInput.value.trim()) {
+                    console.log('[CLIENT] Phone is empty, preventing submit');
+                    e.preventDefault();
+                    return false;
+                }
+                
+                console.log('[CLIENT] Form should submit now');
+            });
+            
+            submitBtn.addEventListener('click', function(e) {
+                console.log('[CLIENT] Submit button clicked');
+            });
+        });
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">    
+
+} 

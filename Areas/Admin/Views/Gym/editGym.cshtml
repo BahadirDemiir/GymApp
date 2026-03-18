@@ -1,0 +1,32 @@
+@model List<GymAppFresh.Models.GymLocation>
+@{
+    ViewData["Title"] = "Salon Aktiflik Düzenleme";
+}
+
+<h2>Salon Aktiflik Durumları</h2>
+
+<form asp-action="EditGym" method="post">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Salon Adı</th>
+                <th>Durum</th>
+            </tr>
+        </thead>
+        <tbody>
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            <tr>
+                <td>
+                    @Model[i].Name
+                    <input type="hidden" asp-for="@Model[i].Id" />
+                </td>
+                <td>
+                    <input type="checkbox" asp-for="@Model[i].IsActive" />
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+</form>
